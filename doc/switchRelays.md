@@ -69,7 +69,7 @@ Here is an example how to read a value in the indicator using C/C++:
 
 ```c 
 uint8_t value = 0; /* Declare the value variable */
-NiFpga_ReadU8(session, NiFpga_mainFPGA_IndicatorU8_debugControlRelays = 0x18006, &value);
+NiFpga_ReadU8(session, NiFpga_mainFPGA_IndicatorU8_debugControlRelays, &value);
 ```
 
 where `session` handles a currently session FPGA, opened with:
@@ -82,3 +82,5 @@ and `value` outputs what was read.
 Its type is `uint8_t`.
 
 Session must be closed when no longer needed.
+
+The C/C++ developer needs to code the bits of `controlRelay` and decode the bits of `debugControlRelays` in his side.
