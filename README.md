@@ -12,14 +12,14 @@ ts_m2fpga
 ├── src
 │   ├── m2fpga.lvproj
 │   ├── mainFPGA.vi
-│   ├── moduleRelays.vi
-│   ├── moduleDaq.vi
-│   ├── moduleIlc.vi
+│   ├── switchRelays.vi
+│   ├── readDaq.vi
+│   ├── ilcCommmunication.vi
 ├── doc
 │   ├── versionHistory.md
-│   ├── moduleRelays.md
-│   ├── moduleDaq.md
-│   ├── moduleIlc.md
+│   ├── switchRelays.md
+│   ├── readDaq.md
+│   ├── ilcCommmunication.md
 ├── fpgaInterface
 │   ├── NiFpga_mainFPGA.h
 │   ├── NiFpga_mainFPGA.lvbitx
