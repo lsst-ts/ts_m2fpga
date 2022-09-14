@@ -30,6 +30,9 @@ log/
 # Build directory
 build/
 
+# FPGA bitfile directory
+fpgaBitfile/
+
 # Vscode setting
 .vscode/
 
