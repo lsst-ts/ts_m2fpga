@@ -16,20 +16,6 @@
 *.lvlps
 .cache/
 
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Log files
-log/
-
-# Build directory
-build/
-
 # Vscode setting
 .vscode/
 
