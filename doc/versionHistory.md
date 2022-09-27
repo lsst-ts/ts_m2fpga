@@ -1,5 +1,11 @@
 # Version History
 
+0.0.3
+
+- Create code in **switchRelays.vi** and **mainFPGA.vi**.
+- Compile FPGA and generate Interface C API files.
+- Update `README.md` file.
+
 0.0.2
 
 - Fix wrong vi names in directory structure of `README.md` file.
