@@ -47,7 +47,6 @@ ts_m2fpga
 │   ├── NiFpga.h
 │   ├── NiFpga_mainFPGA.lvbitx
 │   ├── bitfile
-│       ├── m2fpga_FPGATarget_mainFPGA_LbI4uWv53M4.lvbitx
 │       ├── .gitkeep
 ├── README.md
 └── .gitignore
@@ -62,7 +61,7 @@ When the FPGA application executes, the bitfile loads on the FPGA chip and recon
 Follow [this link](https://knowledge.ni.com/KnowledgeArticleDetails?id=kA03q000000YHVTCA4&l=en-US) if you want to know more about the LabVIEW FPGA compilation process.
 
 Header files will be inside of `fpgaInterface` directory, because they are related to the hardware and need to be part of version control.
-However, the original `lvbitx` inside of `fpgaInterface/build` directory will be no part of version control, because **NiFpga_mainFPGA.lvbitx** is a version of it and it is not necessary to duplicate files.
+However, the original `lvbitx` inside of `fpgaInterface/bitfile` directory will be no part of version control, because **NiFpga_mainFPGA.lvbitx** is a version of it and it is not necessary to duplicate files.
 
 ## FPGA Interface C API
 
