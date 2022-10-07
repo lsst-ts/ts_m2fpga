@@ -106,3 +106,14 @@ This VI will be explained in this [JIRA ticket](https://jira.lsstcorp.org/browse
 ### ilcCommunication VI
 
 This VI will be explained in this [JIRA ticket](https://jira.lsstcorp.org/browse/DM-35830).
+
+## Bitfile Deployment - WARNING
+
+Developer has to be aware that everytime he/she executes the compiled source code into the CompactRIO, the `NiFpga_Open()` function opens a session to the FPGA and automatically downloads the bitfile configuring the circuitry of FPGA.
+
+If Real-Time Processor has an executable (`.rtexe`) running as startup, and the new C/C++ executable wants to run, the developer will be warned that there is another application running, and he/she will need to **stop this executable first** in terms of running the new C/C++ executable.
+This would be very dangerous if the first executable is running an important process.
+
+If developer wants to run the C/C++ executable for testing purpose, after stop working on it, he/she must reboot the CompactRIO to execute again the previous executable.
+
+In the following [document](/doc/bitfileDeployment.md) you will find different options to download the bitfile into the CompactRIO.

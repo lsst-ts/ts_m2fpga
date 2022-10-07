@@ -1,5 +1,10 @@
 # Version History
 
+0.0.4
+
+- Create the `bitfileDeployment.md` document.
+- Modify `README.md` file.
+
 0.0.3
 
 - Create code in **switchRelays.vi** and **mainFPGA.vi**.
