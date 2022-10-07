@@ -109,11 +109,33 @@ This VI will be explained in this [JIRA ticket](https://jira.lsstcorp.org/browse
 
 ## Bitfile Deployment - WARNING
 
-Developer has to be aware that everytime he/she executes the compiled source code into the CompactRIO, the `NiFpga_Open()` function opens a session to the FPGA and automatically downloads the bitfile configuring the circuitry of FPGA.
+Developer has to be aware that everytime he/she executes the compiled source code into the CompactRIO, the `NiFpga_Open()` function opens a session to the FPGA and automatically downloads the bitfile to configure the circuitry of FPGA.
+In the following [document](doc/bitfileDeployment.md) you will find different options to download the bitfile into the CompactRIO.
 
 If Real-Time Processor has an executable (`.rtexe`) running as startup, and the new C/C++ executable wants to run, the developer will be warned that there is another application running, and he/she will need to **stop this executable first** in terms of running the new C/C++ executable.
 This would be very dangerous if the first executable is running an important process.
 
-If developer wants to run the C/C++ executable for testing purpose, after stop working on it, he/she must reboot the CompactRIO to execute again the previous executable.
+To stop a running executable by NI user, you can do:
 
-In the following [document](/doc/bitfileDeployment.md) you will find different options to download the bitfile into the CompactRIO.
+```bash
+/etc/init.d/nilvrt stop
+```
+
+To run the executable if it is not running, you can  do the following if you do not want to reboot the machine:
+
+```bash
+/etc/init.d/nilvrt start
+```
+
+It is noted that the machine on summit is under the control of `puppet`.
+If you want to reboot the machine, you would need to announce in the Slack channel and let IT knows if it is possible.
+After the rebooting, the related switch in global interlock system (GIS) will be reset and the M2 will not be able to use (the interlock will cut-off the power of actuators).
+You need to notify the people on summit to release the interlock of M2 before using it.
+
+In addition, the developer should notify the user (such as the operator or hardware engineer or system engineer) before any test with C/C++ executable.
+This is to remind the users on summit do not use the M2 at this test period.
+
+For the M2 specific project, after you rerun the default executable, you would see a new log file with the current time at `/u/log`.
+You should wait for 3 min to check the contents in the new log file to say all processes start successfully (the download of bitfile needs 60-90 seconds).
+If not, notify the LabVIEW developer immediately to avoid the blocking of tests or operations on summit.
+In addition, you also need to announce in the Slack channel to avoid any user to use the M2 before the problem is fixed.

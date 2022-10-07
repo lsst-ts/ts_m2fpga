@@ -1,7 +1,7 @@
 # Bitfile Deployment in CompactRIO
 
 This document explains different ways to deploy a bitfile to the CompactRIO.
-Is needed to understand what is a CompactRIO, how to program it, what is a bitfile, and how many options we have to deploy this bitfile into the CompactRIO.
+You need to understand what is a CompactRIO, how to program it, what is a bitfile, and how many options we have to deploy this bitfile into the CompactRIO.
 
 ## What is the CompactRIO?
 
@@ -16,7 +16,7 @@ FPGAs are silicon chips with unconnected logic gates.
 You can define the functionality of the FPGA by using software to configure the FPGA gates. 
 FPGAs are completely reconfigurable and instantly take on a brand new “personality” when you download a different configuration of circuitry.
 
-Common use of FPGA are high-performance control loops, high-speed signal acquisition and generation, signal processing and analysis, safe state logic, etc.
+Common uses of FPGA are high-performance control loops, high-speed signal acquisition and generation, signal processing and analysis, safe state logic, etc.
 
 ### Programming the FPGA With LabVIEW
 
@@ -26,34 +26,34 @@ You can download and run only one top-level FPGA VI at a time on a single FPGA t
 If you download a second top-level VI to the FPGA target, the second VI overwrites the first VI.
 
 After the FPGA VI is developed, you want to execute the VI on
-the FPGA target, which will require compiling of code.
+the FPGA target, which will require the compiling of code.
 
 ### Compiling the FPGA VI
 
 The LabVIEW FPGA Module compiles VIs to FPGA hardware using an automatic, multi-step process. 
-Behind the scenes, the VI is translated to text-based **V**ery-High-Speed Integrated Circuit **H**ardware **D**escription **L**anguage (VHDL) code.
-Then industry-standard Xilinx ISE compiler tools optimize, reduce, and synthesize the VHDL code into a hardware circuit realization of the LabVIEW design. 
+Behind the scene, the VI is translated to text-based **V**ery-High-Speed Integrated Circuit **H**ardware **D**escription **L**anguage (VHDL) code.
+The industry-standard Xilinx ISE compiler tools optimize, reduce, and synthesize the VHDL code into a hardware circuit realization of the LabVIEW design. 
 During the FPGA compilation, the VI is optimized to reduce digital logic and create an optimal implementation of the LabVIEW application. 
 The end result is a `bitfile` (.lvbitx) that contains binary data that describes how to configure the FPGA circuit of the FPGA target. 
 When the application runs, the bitfile reconfigures the FPGA circuit of the FPGA target. 
 Go [here](https://www.ni.com/docs/en-US/bundle/labview-fpga-module/page/lvfpgaconcepts/compiling_fpga_vis.html) to know more details about the compilation process.
 
-Each bitfile is unique to the type of the FPGA target for wich the bitfile was compiled.
+Each bitfile is unique to the type of the FPGA target for which the bitfile was compiled.
 
-After we have this bitfile just created, is time to download it into the CompactRIO and create this new "personality".
+After we have this bitfile just created, it is time to download it into the CompactRIO and create this new "personality".
 
 ## How to deploy the bitfile into the CompactRIO?
 
-Following are the available options to download the bitfile into the CompactRIO.
+The followings are the available options to download the bitfile into the CompactRIO.
 
 ### 1. Using NI LabVIEW Real-Time Module
 
-The LabVIEW Real-Time Module is a LabVIEW add-on you can use to create reliable, stand-alone applications that execute on embedded hardware devices like a CompactRIO.
+The LabVIEW Real-Time Module is a LabVIEW add-on you can use to create reliable, standalone applications that execute on embedded hardware devices like a CompactRIO.
 
 The most prevalent method for deploying an FPGA personality (bitfile) is to embed it into the host application. 
-This inclusion into the application occurs when the `Open FPGA Reference` LabVIEW function is used in the host implementation. 
-When the host application is then compiled into an executable (`.rtexe`) the FPGA application is embedded inside this file. 
-Therefore when the host application is deployed and run, it will download the bitfile and open a reference to the FPGA when the Open FPGA Reference function is called.
+This occurs when the `Open FPGA Reference` LabVIEW function is used in the host implementation. 
+After the host application is compiled into an executable (`.rtexe`) the FPGA application is embedded inside this file. 
+Therefore when the host application is deployed and run, it will download the bitfile and open a reference to the FPGA after the Open FPGA Reference function is called.
 
 Once you have the Open FPGA Reference function placed on the VI, right click and select `Configure Open FPGA VI Reference ...` . The dialog box will appear and you can specify open either the FPGA VI or the bitfile, in the following image:
 
@@ -72,7 +72,7 @@ This module also allows you to test the program logic to validate its operation,
 This will begine the compilation process if the bitfile is not created yet or it was modified after the last time it was compiled, and will deploy the FPGA personality to the FPGA target.
 
 It is important to note that interactive front panel communication should only be used for the development phase of an FPGA application as the configuration on the FPGA is volatile. 
-When the bit file is downloaded to the FPGA it will be lost if the device is power cycled, therefore another method is required for stand-alone deployments.
+When the bit file is downloaded to the FPGA it will be lost if the device is power-cycled, therefore another method is required for standalone deployments.
 
 Go to [here](https://www.ni.com/docs/en-US/bundle/labview-fpga-module/page/lvfpgaconcepts/ifp_comm.html) for more information about this.
 
@@ -98,7 +98,7 @@ In the configuration window, use the `Device Settings` tab to configure when the
 
 - **Do not autoload**: Does not load the bitfile from flash memory at startup.
 - **Autoload VI on device powerup**: Loads the bitfile that is stored in flash memory to the FPGA when the system powers up.
-- **Autoload on device reboot**: Loads the bitfile that is stored in flash memory to the FPGA when you reboot the system either with or without cycling power.
+- **Autoload on device reboot**: Loads the bitfile that is stored in flash memory to the FPGA when you reboot the system either with or without power cycling.
 
 If you choose the `Autoload on device reboot` option, then as soon as your device reboots, the device immediately loads the bitfile stored in flash memory and runs the FPGA VI if the `Run when loaded to FPGA` checkbox was enabled in the build specification used to create the bitfile.
 Therefore, you can control the FPGA I/O state of your device as soon as the device is powered on or rebooted.
@@ -122,9 +122,9 @@ If you do not specify a custom prefix, the FPGA Interface C API Generator names 
 The generated FPGA Interface C API consists of the following files: a `.h` file, a `.lvbitx` file, `NiFpga.h`, and `NiFpga.c`:
 
 - **Generated .h File**: The .h file is a C header file that contains all the constants required by function calls in your application. 
-- **Generated .lvbitx Bitfile**: This is a version of the original .lvbitx bitfile, renamed to match the prefix of the constants in the .h header file. NiFpga_Open() must find this file in order to ensure the bitstream is downloaded to the FPGA.
-- **NiFpga.h**: This is a C header file. It is identical for all generated C APIs. It declares all the errors, types, constants, and functions needed to write an application. Most of these functions are defined in NiFpga.c.
-- **NiFpga.c**: This is a C source file that you must include in your application. It is identical for all generated C APIs. It defines all the functions your application can call. NiFpga.c loads and unloads the NiFpga library at runtime, and forwards function calls to that library.
+- **Generated .lvbitx Bitfile**: This is a version of the original .lvbitx bitfile, renamed to match the prefix of the constants in the .h header file. `NiFpga_Open()` must find this file in order to ensure the bitstream is downloaded to the FPGA.
+- **NiFpga.h**: This is a C header file. It is identical for all generated C APIs. It declares all the errors, types, constants, and functions needed to write an application. Most of these functions are defined in `NiFpga.c`.
+- **NiFpga.c**: This is a C source file that you must include in your application. It is identical for all generated C APIs. It defines all the functions your application can call. `NiFpga.c` loads and unloads the NiFpga library at runtime, and forwards function calls to that library.
 
 Follow [this link](https://www.ni.com/docs/en-US/bundle/fpga-interface-c-api-ref/page/capi/fpgac.html) to read the C API Help documentation.
 
@@ -136,26 +136,36 @@ After creating the C/C++ project, including source code and header files, send t
 For this, follow the recomended steps:
 
 - ssh to the CompactRIO.
-- Create a new directory to store the .lvbitx and the C/C++ compiled file.
+- Create a new directory to store the .lvbitx and the C/C++ executable file.
+
+```bash
+mkdir <reasonable_directory>
 ```
-$ mkdir <reasonable_directory>
+
+- Copy the executable from Linux computer to CompactRIO.
+
+```bash
+scp <executable> <user>@<cRIO_ip>:<reasonable_directory>/.
 ```
-- Copy build file from Linux computer to CompactRIO.
-```
-$ scp <build_file> <user>@<cRIO_ip>:<reasonable_directory>/.
-```
+
 - Copy the .lvbitx from the Linux computer to cRIO.
+
+```bash
+scp <NiFpga_<name_of_FPGA_vi>.lvbitx> <user>@<cRIO_ip>:<reasonable_directory>/.
 ```
-$ scp <NiFpga_<name_of_FPGA_vi>.lvbitx> <user>@<cRIO_ip>:<reasonable_directory>/.
-```
-By default <user> is admin and password in "blank" in CompactRIOs.
+
+By default `<user>` is admin and password in "blank" in CompactRIOs.
+It is noted that the cRIOs in base data center and summit do have the password different from the "blank".
 
 - Go to the <reasonable_directory> on CompactRIO.
 - Give permission to run the executable.
+
+```bash
+chmod +x <build_file>
 ```
-$ chmod +x <build_file>
-```
+
 - Run the executable.
-```
-$ ./<build_file>
+
+```bash
+./<executable>
 ```
