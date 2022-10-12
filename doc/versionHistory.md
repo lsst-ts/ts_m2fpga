@@ -1,5 +1,13 @@
 # Version History
 
+0.0.5
+
+- Update the `readDaq.md` file.
+- Add code to `readDaq.vi`.
+- Update Interface C API files.
+- Update the `README.md` file.
+
+
 0.0.4
 
 - Create the `bitfileDeployment.md` document.

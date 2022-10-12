@@ -88,7 +88,8 @@ NiFpga_<FPGA_VI_name>.h
 
 For instance, if the FPGA VI name is **mainFPGA.vi**, the header file will be named `NiFpga_mainFPGA.h`.
 
-Follow this link with a [FPGA C API Demo](https://confluence.lsstcorp.org/display/LTS/FPGA+C+API+Interface+Demo).
+You can go to the [FPGA Interface C API Reference](https://www.ni.com/docs/en-US/bundle/fpga-interface-c-api-ref/page/capi/fpgac.html) for more information.
+Here is a [demo](https://confluence.lsstcorp.org/display/LTS/FPGA+C+API+Interface+Demo) for this C API.
 
 ## FPGA VIs
 
@@ -96,12 +97,13 @@ The main LabVIEW FPGA code will be named **mainFPGA.vi** and it will call three 
 
 ### switchRelays VI
 
-This VI will be in `src/` directory.
+This VI will be in `src/support` directory.
 Follow [here](doc/switchRelays.md) for details.
 
 ### readDaq VI
 
-This VI will be explained in this [JIRA ticket](https://jira.lsstcorp.org/browse/DM-35829).
+This VI will be in `src/support` directory.
+Follow [here](doc/readDaq.md) for details.
 
 ### ilcCommunication VI
 
