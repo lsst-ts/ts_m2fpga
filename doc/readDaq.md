@@ -3,11 +3,11 @@
 This VI will read data from analog sensors and status of relays, using NI modules.
 This data will be put into a data structure that holds elements in the order they are received and provides access to those elements using a first-in, first-out (FIFO) basis, and will be named `daqFIFO`.
 
-This VI will have a control named `loopRate_us`, a control named `enableCapture`, and an indicator named `dataFifoFull`.
+This VI will have a control named `loopRateInUs`, a control named `enableCapture`, and an indicator named `dataFifoFull`.
 
 ## Loop Rate
 
-The `loopRate_us` is an 32-bit unsigned (U32) integer control that controls the acquisition rate.
+The `loopRateInUs` is an 32-bit unsigned (U32) integer control that controls the acquisition rate.
 The unit of this control is micro seconds.
 If this control is set to zero, the slower NI module will set the acquisition rate, for instance the NI-9201 will scan all channels every 2 micro seconds.
 
@@ -41,8 +41,10 @@ Session must be closed when no longer needed.
 ## Enable Capture
 
 The `enableCapture` is a boolean control.
-When this control is TRUE the read data is put into the `daqFIFO`.
-When is FALSE, the read data is not.
+When this control is TRUE the read data is put into the `daqFIFO`, so the Real-Time processor will receive the acquired data.
+When is FALSE, the read data is not, so the Real-Time processor will not receive the acquired data.
+C/C++ developer must initialize to FALSE this control during the FPGA initialization.
+
 It is declared as a typedef enum like this:
 
 ```c
