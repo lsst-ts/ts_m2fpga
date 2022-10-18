@@ -1202,7 +1202,6 @@ DirectoryIndex index.htm
 					<Item Name="vi.lib" Type="Folder">
 						<Item Name="lvSimController.dll" Type="Document" URL="/&lt;vilib&gt;/rvi/Simulation/lvSimController.dll"/>
 					</Item>
-					<Item Name="DAQ_FXP_to_uword.vi" Type="VI" URL="../../../ts_mtm2_cell/M2CellController/ProcessVIs/DAQ_Process/support/DAQ_FXP_to_uword.vi"/>
 				</Item>
 				<Item Name="Build Specifications" Type="Build">
 					<Item Name="mainFPGA" Type="{F4C5E96F-7410-48A5-BB87-3559BC9B167F}">
