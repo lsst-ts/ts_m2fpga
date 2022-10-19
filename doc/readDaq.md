@@ -165,18 +165,37 @@ Digital inputs.
 
 | Bit15 | Bit14 | Bit13 | Bit12 | Bit11 | Bit10 | Bit9 | Bit8 | 
 |:---:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-|  CB10 | CB9 | CB8 | CB7 | CB6 | CB5 | CB4 | CB3
+|  CB10_DR2 | CB9_DR2 | CB8_DR2 | CB7_DR2 | CB6_DR2 | CB5_DR2 | CB4_DR2 | CB3_DR2
 
-- CB10: (no more info).
-- CB9: (no more info).
-- CB8: (no more info).
-- CB7: (no more info).
-- CB6: (no more info).
-- CB5: (no more info).
-- CB4: (no more info).
-- CB3: (no more info).
+- CB10: Connector Block 10 of DIN Rail 2 (no more info).
+- CB9_DR2: Connector Block 9 of DIN Rail 2 (no more info).
+- CB8_DR2: Connector Block 8 of DIN Rail 2 (no more info).
+- CB7_DR2: Connector Block 7 of DIN Rail 2 (no more info).
+- CB6_DR2: Connector Block 6 of DIN Rail 2 (no more info).
+- CB5_DR2: Connector Block 5 of DIN Rail 2 (no more info).
+- CB4_DR2: Connector Block 4 of DIN Rail 2 (no more info).
+- CB3_DR2: Connector Block 3 of DIN Rail 2 (no more info).
 
 ### Element 8 of FIFO
 
+Digital inputs.
+
+| Bit23 | Bit22 | Bit21 | Bit20 | Bit19 | Bit18 | Bit17 | Bit16 | 
+|:---:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+|   |  |  |  |  |  |  | 
+
 ### Element 9 of FIFO
 
+Digital inputs.
+
+| Bit31 | Bit30 | Bit29 | Bit28 | Bit27 | Bit26 | Bit25 | Bit24 | 
+|:---:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+|  PILZ_CON | NC | NC | CB15_DR2 | CB14_DR2 | CB13_DR2 | CB12_DR2 | CB11_DR2 |
+
+- PILZ_CON: X2-T1m21 of PILZ B0 (find more info).
+- NC : no connected
+- CB15_DR2: Connector Block 15 of DIN Rail 2 (no more info).
+- CB14_DR2: Connector Block 14 of DIN Rail 2 (no more info).
+- CB13_DR2: Connector Block 13 of DIN Rail 2 (no more info).
+- CB12_DR2: Connector Block 12 of DIN Rail 2 (no more info).
+- CB11_DR2: Connector Block 11 of DIN Rail 2 (no more info).
