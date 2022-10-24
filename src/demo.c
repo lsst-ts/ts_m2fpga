@@ -42,6 +42,7 @@ int main()
                printf("dataFifoFull is FALSE\n");
                       
             i += 1;
+            sleep(1);
          }                                  
             
          printf("Press <Enter> to stop and quit...");
