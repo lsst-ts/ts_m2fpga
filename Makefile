@@ -16,20 +16,20 @@ SRCDIR := ./src
 BINDIR := ./bin
 
 LDFLAGS = -ldl
-EXECUTABLE = crio
+EXECUTABLE = demo
 OBJECTS = demo.o NiFpga.o
 
 # Include header file directories
-INC := -I ./include
+INC := -I ./fpgaInterface
 
 all: $(OBJECTS)
-	$(CC) $(SRCDIR)/demo.o include/NiFpga.o $(LDFLAGS) -o $(EXECUTABLE)
+	$(CC) $(SRCDIR)/demo.o fpgaInterface/NiFpga.o $(LDFLAGS) -o $(EXECUTABLE)
 
 demo.o:
 	$(CC) -c $(SRCDIR)/demo.c -o $(SRCDIR)/demo.o
 
 NiFpga.o:
-	$(CC) -c include/NiFpga.c -o include/NiFpga.o
+	$(CC) -c fpgaInterface/NiFpga.c -o fpgaInterface/NiFpga.o
 
 clean:
-	rm -f $(EXECUTABLE) include/NiFpga.o $(SRCDIR)/demo.o
+	rm -f $(EXECUTABLE) fpgaInterface/NiFpga.o $(SRCDIR)/demo.o
