@@ -13,6 +13,7 @@ int main()
 {
    /* must be called before any other calls */
    printf("Initializing...\n");
+   printf("Reading dataFifoFull indicator...\n");
    NiFpga_Status status = NiFpga_Initialize();
    if (NiFpga_IsNotError(status))
    {
@@ -25,14 +26,24 @@ int main()
                                         "RIO0",
                                         NiFpga_OpenAttribute_NoRun,
                                         &session);
+      
       if (NiFpga_IsNotError(status))
       {
-         /* run the FPGA application */
-         printf("Running the FPGA...\n");
          NiFpga_Run(session, 0);
-                
-         // add code here //
-
+         NiFpga_Bool fifoStatus = NiFpga_False;
+         int i = 0;             
+         // read indicator during 10 seconds
+         while (i < 10)
+         {
+            NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull,&fifoStatus);               
+            if (fifoStatus)
+               printf("dataFifoFull is TRUE\n");
+            else 
+               printf("dataFifoFull is FALSE\n");
+                      
+            i += 1;
+         }                                  
+            
          printf("Press <Enter> to stop and quit...");
          getchar();
          /* stop the FPGA loops */
