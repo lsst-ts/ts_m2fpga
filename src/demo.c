@@ -28,34 +28,44 @@ int main()
       if (NiFpga_IsNotError(status))
       {
          /* run the FPGA application */
+  	 printf("Running the FPGA...\n");
          NiFpga_Run(session, 0);
    
          // Variables //
-         uint16_t* data;
+         uint16_t* data = NULL;
          size_t numberOfElements;
          uint32_t timeout;
-         size_t* elementsRemaining;
-         
-         numberOfElements = 0;
-         timeout = 0;     
-         NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
-                              &data, 
-                              numberOfElements, 
-                              timeout, 
-                              &elementsRemaining);
-         
-         if (elementsRemaining >= 9)
-         {
-            printf("Elements Remaining = %d\n", &elementsRemaining);
-            numberOfElements = 9;
-            timeout = 0;
-            NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
-                              &data, 
-                              numberOfElements, 
-                              timeout, 
-                              &elementsRemaining);
-         }
+         size_t elementsRemaining;
 
+         /* allocate size for the samples to read */
+         data = (uint16_t*) malloc (sizeof (uint16_t));
+         
+         while(1)
+	 {
+          numberOfElements = 0;
+          timeout = 0;     
+          NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
+                              data, 
+                              numberOfElements, 
+                              timeout, 
+                              &elementsRemaining);
+         
+          printf("Elements Remaining = %d\n", elementsRemaining);
+
+          if (elementsRemaining >= 9)
+          {
+             printf("Elements Remaining = %d\n", elementsRemaining);
+             numberOfElements = 9;
+             timeout = 0;
+             NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
+                              data, 
+                              numberOfElements, 
+                              timeout, 
+                              &elementsRemaining);
+          }
+
+             sleep(0,500);
+        }
          printf("Press <Enter> to stop and quit...");
          getchar();
          /* stop the FPGA loops */
