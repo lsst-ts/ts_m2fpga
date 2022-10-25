@@ -8,6 +8,7 @@
 #include "../fpgaInterface/NiFpga_mainFPGA.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h> // avoid warning in sleep()
 
 int main()
 {
@@ -18,7 +19,6 @@ int main()
       NiFpga_Session session;
       /* opens a session and downloads the bitstream */
       printf("Opening a session...\n");
-      //NiFpga_MergeStatus(&status);
       NiFpga_Open(NiFpga_mainFPGA_Bitfile,
                                         NiFpga_mainFPGA_Signature,
                                         "RIO0",
@@ -36,9 +36,10 @@ int main()
          size_t numberOfElements;
          uint32_t timeout;
          size_t elementsRemaining;
+	 NiFpga_Bool fifoStatus;
 
          /* allocate size for the samples to read */
-         data = (uint16_t*) malloc (sizeof (uint16_t));
+         // data = (uint16_t*) malloc (sizeof (uint16_t));
          
          while(1)
 	 {
@@ -64,7 +65,12 @@ int main()
                               &elementsRemaining);
           }
 
-             sleep(0,500);
+             // Read the fifoStatus boolean
+	     NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull, &fifoStatus);
+             if (fifoStatus){printf("fifoStatus is TRUE.\n");}
+		else {printf("fifoStatus is FALSE.\n");}
+
+	     sleep(0.050);
         }
          printf("Press <Enter> to stop and quit...");
          getchar();
