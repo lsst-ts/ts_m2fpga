@@ -11,9 +11,7 @@
 
 int main()
 {
-   /* must be called before any other calls */
    printf("Initializing...\n");
-   printf("Reading dataFifoFull indicator...\n");
    NiFpga_Status status = NiFpga_Initialize();
    if (NiFpga_IsNotError(status))
    {
@@ -26,15 +24,12 @@ int main()
                                         "RIO0",
                                         NiFpga_OpenAttribute_NoRun,
                                         &session);
+      
       if (NiFpga_IsNotError(status))
       {
          /* run the FPGA application */
-         // printf("Running the FPGA...\n");
          NiFpga_Run(session, 0);
-
-         NiFpga_Bool fifoStatus = NiFpga_False; /* Declare the variable */
-
-         
+   
          // Variables //
          uint16_t* data;
          size_t numberOfElements;
@@ -42,8 +37,7 @@ int main()
          size_t* elementsRemaining;
          
          numberOfElements = 0;
-         timeout = 0;
-         
+         timeout = 0;     
          NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
                               &data, 
                               numberOfElements, 
@@ -60,7 +54,6 @@ int main()
                               numberOfElements, 
                               timeout, 
                               &elementsRemaining);
-        
          }
 
          printf("Press <Enter> to stop and quit...");
