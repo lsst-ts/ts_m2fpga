@@ -34,20 +34,33 @@ int main()
 
          NiFpga_Bool fifoStatus = NiFpga_False; /* Declare the variable */
 
-         int i = 0;             
-         /* read indicator during 10 seconds */
-         do {
-                                   
-            NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull,&fifoStatus);               
-            if (fifoStatus)
-               printf("dataFifoFull is TRUE\n");
-               else
-               printf("dataFifoFull is FALSE\n");
-            
-            i += 1;
-         }
-         while (i == 9)
-          
+         
+         // Variables //
+         uint16_t* data;
+         size_t numberOfElements;
+         uint32_t timeout;
+         size_t* elementsRemaining;
+         
+         numberOfElements = 0;
+         timeout = 0;
+         
+         NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
+                              &data, 
+                              numberOfElements, 
+                              timeout, 
+                              &elementsRemaining);
+         
+         if (elementsRemaining >= 9)
+         {
+            printf("Elements Remaining = %d\n", &elementsRemaining);
+            numberOfElements = 9;
+            timeout = 0;
+            NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
+                              &data, 
+                              numberOfElements, 
+                              timeout, 
+                              &elementsRemaining);
+        
          }
 
          printf("Press <Enter> to stop and quit...");
