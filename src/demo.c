@@ -35,7 +35,8 @@ int main()
          uint16_t* data = NULL;
          size_t numberOfElements;
          uint32_t timeout;
-         size_t elementsRemaining;
+         size_t elementsRemaining = 0; // variable declaration
+         size_t* ptr_elementsRemaining = &elementsRemaining; // pointer declaration
 	 NiFpga_Bool fifoStatus;
 
          /* allocate size for the samples to read */
@@ -51,11 +52,11 @@ int main()
                               timeout, 
                               &elementsRemaining);
          
-          printf("Elements Remaining = %d\n", elementsRemaining);
+          printf("Elements Remaining = %d\n", *ptr_elementsRemaining);
 
-          if (elementsRemaining >= 9)
+          if (*ptr_elementsRemaining >= 9)
           {
-             printf("Elements Remaining = %d\n", elementsRemaining);
+             printf("Elements Remaining = %d\n", *ptr_elementsRemaining);
              numberOfElements = 9;
              timeout = 0;
              NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
