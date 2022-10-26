@@ -14,6 +14,7 @@ int main()
 {
    printf("Initializing...\n");
    NiFpga_Status status = NiFpga_Initialize();
+   char* bitfilePath = "fpgaInterface/NiFpga_mainFPGA.lvbitx"; 
    if (NiFpga_IsNotError(status))
    {
       NiFpga_Session session;
@@ -21,7 +22,7 @@ int main()
       printf("Opening a session...\n");
       
       NiFpga_Status status = 0;
-      status = NiFpga_Open(NiFpga_mainFPGA_Bitfile,
+      status = NiFpga_Open(bitfilePath,
                                         NiFpga_mainFPGA_Signature,
                                         "RIO0",
                                         NiFpga_OpenAttribute_NoRun,
