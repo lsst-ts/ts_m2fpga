@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h> // avoid warning in sleep()
-#include <time.h>
+// #include <time.h>
 
 int main()
 {
@@ -43,7 +43,8 @@ int main()
          size_t elementsRemaining = 0; // variable declaration
 	 NiFpga_Bool fifoStatus = 0;
      
-         while(1)
+         int j = 0;
+	 while(j < 150)
 	 {
           numberOfElements = 0;
           timeout = 0;     
@@ -77,10 +78,17 @@ int main()
            }
                                  
 
-	  usleep(20000); // 20 ms
-        }
-         printf("Press <Enter> to stop and quit...");
-         getchar();
+	  usleep(10000); // 10 ms
+          j++;
+	  printf("j = %d\n", j);
+          NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull, &fifoStatus);
+          printf("fifoStatus = %d\n",(int)fifoStatus);
+
+
+         } // end while
+         
+         // printf("Press <Enter> to stop and quit...");
+         // getchar();
          /* stop the FPGA loops */
 
 
