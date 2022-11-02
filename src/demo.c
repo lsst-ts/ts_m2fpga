@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h> // avoid warning in sleep()
+#include <time.h>
 
 int main()
 {
@@ -36,33 +37,53 @@ int main()
          NiFpga_Run(session, 0);
    
          // Variables //
-         uint16_t data[2] = {0, 0};
+         uint16_t data[9] = {0};
          size_t numberOfElements;
          uint32_t timeout;
          size_t elementsRemaining = 0; // variable declaration
 	 NiFpga_Bool fifoStatus = 0;
-
-         /* allocate size for the samples to read */
-         // data = (uint16_t*) malloc (sizeof (uint16_t));
-         
+     
          while(1)
 	 {
-          numberOfElements = 2;
-          timeout = 1000;     
+          numberOfElements = 0;
+          timeout = 0;     
           status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
                               &data[0], 
                               numberOfElements, 
                               timeout, 
                               &elementsRemaining);
-         
-          printf("Elements Remaining = %d, status = %d\n", elementsRemaining, status);
-          printf("Data[0] is %d\n", data[0]);
+      
+          printf("Elements Remaining Before = %d, status = %d\n", elementsRemaining, status);
 
-	  sleep(1);
+          if (elementsRemaining > 9) 
+           {
+            numberOfElements = 9;
+            
+            status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
+                              &data[0],
+                              numberOfElements,
+                              timeout,
+                              &elementsRemaining);
+      		          
+            printf("Elements Remaining After = %d, status = %d\n", elementsRemaining, status);
+            
+            printf("Data:\t");
+            for (int i = 0; i < numberOfElements; i++)
+               {              
+                printf("%d\t", data[i]);
+               }
+            printf("\n"); 
+            NiFpga_ReleaseFifoElements(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, numberOfElements);
+           }
+                                 
+
+	  usleep(20000); // 20 ms
         }
          printf("Press <Enter> to stop and quit...");
          getchar();
          /* stop the FPGA loops */
+
+
          printf("Stopping the FPGA...\n");
          
          /* close the session now that we're done */
