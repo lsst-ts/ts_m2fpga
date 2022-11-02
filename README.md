@@ -3,7 +3,7 @@
 ## Overview
 
 This project will improve the FPGA code in the [M2 Cell Controller LabVIEW project](https://github.com/lsst-ts/ts_mtm2_cell).
-In that version, the VI named **4-port serial Master Slave.vi**, under `Chassis (cRIO-9038) >> FPGA Target (RIO0, cRIO-9038)` in the Project Explorer, interacts with the hardware inputs and outputs.
+In that version, the VI named **4-port serial Master Slave.vi**, under `Chassis (cRIO-9049) >> FPGA Target (RIO0, cRIO-9049)` in the Project Explorer, interacts with the hardware inputs and outputs.
 
 ## Platform
 

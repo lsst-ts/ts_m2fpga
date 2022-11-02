@@ -7,8 +7,7 @@ This VI will have an indicator named `dataFifoFull`.
 
 ## DAQ FIFO
 
-The `daqFiFO` is a data structure with an U16 data type defined, 9 elements to store, and configured as a `target-to-host DMA` FIFO, that means the elements will be written in the FPGA target and read by the host.
-This data structure will store the data read by NI modules and it can be read by the Real-Time processor.
+The `daqFiFO` is a data structure with an U16 data type defined, 9 elements to store, and configured as a `target-to-host DMA` FIFO, that means the elements will be written in the FPGA target and read by the real-time processor (host).
 
 It is declared as a typedef enum like this:
 
@@ -18,19 +17,19 @@ It is declared as a typedef enum like this:
 } NiFpga_mainFPGA_TargetToHostFifoU16;
 ```
 
-Here is an example to read from the `daqFIFO` using C/C++, where the parameter `session` handles a currently FPGA session, `NiFpga_mainFPGA_TargetToHostFifoU16`  is the FIFO from which to read, `data` outputs the data that was read, `numberOfElements` is the number of elements to read, `timeout` specifies the time in miliseconds the function waits for available data in the FIFO if the FIFO is empty, and `elementsRemaining` outputs the number of elements remaining in the host memory part of the FIFO.
+Here is an example to read from the `daqFIFO` using C/C++, where the parameter `session` handles a currently FPGA session, `NiFpga_mainFPGA_TargetToHostFifoU16`  is the FIFO from which to read, `data` outputs the data that was read as an array of elements, `numberOfElements` is the number of elements to read, `timeout` specifies the time in miliseconds the function waits for available data in the FIFO if the FIFO is empty, and `elementsRemaining` outputs the number of elements remaining in the host memory part of the FIFO.
 
 A value of `0` in `timeout` indicates that the function does not wait for available data.
 If use `NiFpga_InfiniteTimeout` it waits forever for available data. 
 
 ```c 
 /* Declare the variables */
-uint16_t data = 0;
+uint16_t data[9] ={0}; // if you want to put 9 elements into the array
 size_t numberOfElements = 9;
 uint32_t timeout = 0;
-size_t elementsRemaining = NULL
+size_t elementsRemaining = 0;
 
-NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16, &data, numberOfElements, timeout, &value);
+NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16, &data[0], numberOfElements, timeout, &elementsRemaining);
 ```
 
 ## Data FIFO Full Indicator
@@ -38,7 +37,7 @@ NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16, &data, numberOf
 The `dataFifoFull` is a boolean indicator.
 If it is TRUE the `daqFIFO` is full and data is not written to the FIFO until space becomes available.
 The following data that is trying to write into the FIFO will be lost until there is new space available. 
-C++ developer can use this to know if the code is reading slower than the FPGA is adding elements into the FIFO.
+The C/C++ developer can use this to determine if the code reads data slower than the FPGA adds elements into the FIFO, then make a decision.
 
 It is declared as a typedef enum like this:
 
@@ -54,7 +53,9 @@ It is created after the FPGA compilation.
 Here is an example how to read a value in this control using C/C++:
 
 ```c 
-NiFpga_Bool fifoStatus = NiFpga_False; /* Declare the variable */
+/* Declare the variable */
+NiFpga_Bool fifoStatus = 0;
+
 NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull, &fifoStatus);
 ```
 
