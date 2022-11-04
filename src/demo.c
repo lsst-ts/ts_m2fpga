@@ -78,7 +78,7 @@ int main()
            }
                                  
 
-	  usleep(10000); // 10 ms
+	  usleep(20000); // 20 ms
           j++;
 	  printf("j = %d\n", j);
           NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull, &fifoStatus);
@@ -86,7 +86,34 @@ int main()
 
 
          } // end while
+
+	 // read the remaining elmements in the FIFO after stop the reading
+         numberOfElements = 0;
+         status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
+                              &data[0],
+                              numberOfElements,
+                              timeout,
+                              &elementsRemaining);
+         printf("Elements Remaining at the end = %d, status = %d\n", elementsRemaining, status);
          
+         // acquire elements based on the number of elements remaining
+         numberOfElements = elementsRemaining;
+         status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
+                              &data[0],
+                              numberOfElements,
+                              timeout,
+                              &elementsRemaining);
+         printf("Elements Remaining after acquired them = %d, status = %d\n", elementsRemaining, status);
+
+	 // check whether or not there are elements remaining
+         numberOfElements = 0;
+         status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
+                              &data[0],
+                              numberOfElements,
+                              timeout,
+                              &elementsRemaining);
+         printf("Elements Remaining = %d, status = %d\n", elementsRemaining, status);
+
          // printf("Press <Enter> to stop and quit...");
          // getchar();
          /* stop the FPGA loops */
