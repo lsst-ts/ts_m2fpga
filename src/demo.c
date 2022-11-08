@@ -29,7 +29,10 @@ int main()
                                         NiFpga_OpenAttribute_NoRun,
                                         &session);
       printf("Status to open the NiFPGA bitfile is %d\n", status);
-      
+      status = NiFpga_Reset(session);
+      printf("status = %d\n", status);
+
+   
       if (NiFpga_IsNotError(status))
       {
          /* run the FPGA application */
@@ -74,7 +77,8 @@ int main()
                 printf("%d\t", data[i]);
                }
             printf("\n"); 
-            NiFpga_ReleaseFifoElements(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, numberOfElements);
+            //status = NiFpga_ReleaseFifoElements(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, numberOfElements);
+	    //printf("status = %d\n", status);
            }
                                  
 
@@ -87,7 +91,7 @@ int main()
 
          } // end while
 
-	 // read the remaining elmements in the FIFO after stop the reading
+	 printf("Read the remaining elmements in the FIFO after stop the reading.\n");
          numberOfElements = 0;
          status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
