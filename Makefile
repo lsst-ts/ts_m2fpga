@@ -16,20 +16,20 @@ SRCDIR := ./src
 BINDIR := ./bin
 
 LDFLAGS = -ldl
-EXECUTABLE = demo
-OBJECTS = demo.o NiFpga.o
+EXECUTABLE = fifoRead
+OBJECTS = fifoRead.o NiFpga.o
 
 # Include header file directories
 INC := -I ./fpgaInterface
 
 all: $(OBJECTS)
-	$(CC) $(SRCDIR)/demo.o fpgaInterface/NiFpga.o $(LDFLAGS) -o $(EXECUTABLE)
+	$(CC) $(SRCDIR)/fifoRead.o fpgaInterface/NiFpga.o $(LDFLAGS) -o $(EXECUTABLE)
 
-demo.o:
-	$(CC) -c $(SRCDIR)/demo.c -o $(SRCDIR)/demo.o
+fifoRead.o:
+	$(CC) -c $(SRCDIR)/fifoRead.c -o $(SRCDIR)/fifoRead.o
 
 NiFpga.o:
 	$(CC) -c fpgaInterface/NiFpga.c -o fpgaInterface/NiFpga.o
 
 clean:
-	rm -f $(EXECUTABLE) fpgaInterface/NiFpga.o $(SRCDIR)/demo.o
+	rm -f $(EXECUTABLE) fpgaInterface/NiFpga.o $(SRCDIR)/fifoRead.o

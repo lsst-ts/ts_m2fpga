@@ -1,20 +1,21 @@
 /*
  * Example code to C/C++ developer
- * Using m2-crio-simulator.ls.lsst.org
- * And C API interface
- * cRIO-9049
+ * Use NiFpga_ReadFifoU16() to read FIFO elements
+ * Use m2-crio-simulator.ls.lsst.org
+ * Use NI FPGA C API Interface
+ * Use cRIO-9049
  */
 
 #include "../fpgaInterface/NiFpga_mainFPGA.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h> // avoid warning in sleep()
-// #include <time.h>
+#include <unistd.h>
 
 int main()
 {
    printf("Initializing...\n");
    NiFpga_Status status = NiFpga_Initialize();
+   // Use the NiFpga_mainFPGA.lvbitx instead the original bitfile 
    char* bitfilePath = "fpgaInterface/NiFpga_mainFPGA.lvbitx"; 
    if (NiFpga_IsNotError(status))
    {
@@ -29,69 +30,67 @@ int main()
                                         NiFpga_OpenAttribute_NoRun,
                                         &session);
       printf("Status to open the NiFPGA bitfile is %d\n", status);
+      // Reset the FPGA (suggested by Petr)
       status = NiFpga_Reset(session);
-      printf("status = %d\n", status);
-
+      printf("Status to reset the FPGA is %d\n", status);
    
+      // If there is no error we run the FPGA
       if (NiFpga_IsNotError(status))
       {
          /* run the FPGA application */
-  	 printf("Running the FPGA...\n");
-         NiFpga_Run(session, 0);
+  	      printf("Running the FPGA...\n");
+         status = NiFpga_Run(session, 0);
+         printf("Status to run the FPGA is %d\n", status);
    
          // Variables //
          uint16_t data[9] = {0};
          size_t numberOfElements;
          uint32_t timeout;
-         size_t elementsRemaining = 0; // variable declaration
-	 NiFpga_Bool fifoStatus = 0;
+         size_t elementsRemaining = 0;
+	      NiFpga_Bool fifoStatus = 0;
      
          int j = 0;
-	 while(j < 150)
-	 {
-          numberOfElements = 0;
-          timeout = 0;     
-          status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
+         while(j < 150)
+         {
+            numberOfElements = 0;
+            timeout = 0;     
+            status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
                               &data[0], 
                               numberOfElements, 
                               timeout, 
                               &elementsRemaining);
-      
-          printf("Elements Remaining Before = %d, status = %d\n", elementsRemaining, status);
 
-          if (elementsRemaining > 9) 
-           {
-            numberOfElements = 9;
-            
-            status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
+            printf("Elements remaining before reading = %d, status = %d\n", elementsRemaining, status);
+
+            if (elementsRemaining > 9) 
+            {
+               numberOfElements = 9;
+               status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
                               numberOfElements,
                               timeout,
                               &elementsRemaining);
-      		          
-            printf("Elements Remaining After = %d, status = %d\n", elementsRemaining, status);
-            
-            printf("Data:\t");
-            for (int i = 0; i < numberOfElements; i++)
-               {              
-                printf("%d\t", data[i]);
-               }
-            printf("\n"); 
-            //status = NiFpga_ReleaseFifoElements(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, numberOfElements);
-	    //printf("status = %d\n", status);
-           }
-                                 
-
-	  usleep(20000); // 20 ms
-          j++;
-	  printf("j = %d\n", j);
-          NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull, &fifoStatus);
-          printf("fifoStatus = %d\n",(int)fifoStatus);
-
-
+                        
+               printf("Elements remaining after reading = %d, status = %d\n", elementsRemaining, status);
+               printf("Data:\t");
+               for (int i = 0; i < numberOfElements; i++)
+                  {              
+                     printf("%d\t", data[i]);
+                  }
+               printf("\n"); 
+               //status = NiFpga_ReleaseFifoElements(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, numberOfElements);
+               //printf("status = %d\n", status);
+            } // end if
+                               
+            usleep(20000); // 20 ms
+            j++;
+            printf("while iteration = %d\n", j);
+            status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull, &fifoStatus);
+            printf("Status to read dataFifoFull boolean is %d\n", status);
+            printf("fifoStatus = %d\n",(int)fifoStatus);
          } // end while
 
-	 printf("Read the remaining elmements in the FIFO after stop the reading.\n");
+	      printf("Read the remaining elmements in the FIFO after stop the reading.\n");
          numberOfElements = 0;
          status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
@@ -109,7 +108,7 @@ int main()
                               &elementsRemaining);
          printf("Elements Remaining after acquired them = %d, status = %d\n", elementsRemaining, status);
 
-	 // check whether or not there are elements remaining
+	      // check whether or not there are elements remaining
          numberOfElements = 0;
          status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
@@ -122,7 +121,6 @@ int main()
          // getchar();
          /* stop the FPGA loops */
 
-
          printf("Stopping the FPGA...\n");
          
          /* close the session now that we're done */
@@ -132,7 +130,8 @@ int main()
       /* must be called after all other calls */
       printf("Finalizing...\n");
       NiFpga_Finalize();
-   }
+   } //end if
+   
    /* check if anything went wrong */
    if (NiFpga_IsError(status))
    {
