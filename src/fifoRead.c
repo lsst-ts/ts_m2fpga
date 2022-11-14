@@ -13,26 +13,30 @@
 
 int main()
 {
+   NiFpga_Status status = 0;
+   
    printf("Initializing...\n");
-   NiFpga_Status status = NiFpga_Initialize();
-   // Use the NiFpga_mainFPGA.lvbitx instead the original bitfile 
+   status = NiFpga_Initialize();
+   
+   /* Use the NiFpga_mainFPGA.lvbitx instead the original bitfile */
    char* bitfilePath = "fpgaInterface/NiFpga_mainFPGA.lvbitx"; 
+
    if (NiFpga_IsNotError(status))
    {
       NiFpga_Session session;
       /* opens a session and downloads the bitstream */
       printf("Opening a session...\n");
       
-      NiFpga_Status status = 0;
       status = NiFpga_Open(bitfilePath,
                                         NiFpga_mainFPGA_Signature,
                                         "RIO0",
                                         NiFpga_OpenAttribute_NoRun,
                                         &session);
       printf("Status to open the NiFPGA bitfile is %d\n", status);
-      // Reset the FPGA (suggested by Petr)
-      status = NiFpga_Reset(session);
-      printf("Status to reset the FPGA is %d\n", status);
+      
+      /* Reset the FPGA (suggested by Petr) */
+      //status = NiFpga_Reset(session);
+      //printf("Status to reset the FPGA is %d\n", status);
    
       // If there is no error we run the FPGA
       if (NiFpga_IsNotError(status))
@@ -50,7 +54,7 @@ int main()
 	      NiFpga_Bool fifoStatus = 0;
      
          int j = 0;
-         while(j < 150)
+         while(j < 100)
          {
             numberOfElements = 0;
             timeout = 0;     
@@ -62,7 +66,7 @@ int main()
 
             printf("Elements remaining before reading = %d, status = %d\n", elementsRemaining, status);
 
-            if (elementsRemaining > 9) 
+            if (elementsRemaining >= 9) 
             {
                numberOfElements = 9;
                status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
@@ -82,7 +86,7 @@ int main()
                //printf("status = %d\n", status);
             } // end if
                                
-            usleep(20000); // 20 ms
+            usleep(15000); // 15 ms
             j++;
             printf("while iteration = %d\n", j);
             status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull, &fifoStatus);
@@ -90,24 +94,7 @@ int main()
             printf("fifoStatus = %d\n",(int)fifoStatus);
          } // end while
 
-	      printf("Read the remaining elmements in the FIFO after stop the reading.\n");
-         numberOfElements = 0;
-         status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
-                              &data[0],
-                              numberOfElements,
-                              timeout,
-                              &elementsRemaining);
-         printf("Elements Remaining at the end = %d, status = %d\n", elementsRemaining, status);
          
-         // acquire elements based on the number of elements remaining
-         numberOfElements = elementsRemaining;
-         status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
-                              &data[0],
-                              numberOfElements,
-                              timeout,
-                              &elementsRemaining);
-         printf("Elements Remaining after acquired them = %d, status = %d\n", elementsRemaining, status);
-
 	      // check whether or not there are elements remaining
          numberOfElements = 0;
          status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
@@ -119,17 +106,19 @@ int main()
 
          // printf("Press <Enter> to stop and quit...");
          // getchar();
-         /* stop the FPGA loops */
 
+         /* stop the FPGA loops */
          printf("Stopping the FPGA...\n");
          
          /* close the session now that we're done */
          printf("Closing the session...\n");
-         NiFpga_Close(session, 0);
+         status = NiFpga_Close(session, 0);
+         printf("Status to close the FPGA %d\n", status);
       }
       /* must be called after all other calls */
       printf("Finalizing...\n");
-      NiFpga_Finalize();
+      status = NiFpga_Finalize();
+      printf("Status to finalize the FPGA %d\n", status);
    } //end if
    
    /* check if anything went wrong */
