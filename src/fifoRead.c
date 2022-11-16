@@ -76,6 +76,13 @@ int main()
                               &elementsRemaining);
                         
                printf("Elements remaining after reading = %d, status = %d\n", elementsRemaining, status);
+
+	       printf("Addresses:\n");
+               for (int i=0; i<numberOfElements; i++){
+                  printf("%p\t", &data[i]);
+               }
+	       printf("\n");
+
                printf("Data:\t");
                for (int i = 0; i < numberOfElements; i++)
                   {              
