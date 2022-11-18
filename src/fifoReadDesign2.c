@@ -59,11 +59,20 @@ int main()
 	      NiFpga_Bool fifoStatus = 0;
      
          int j = 0;
-	 printf("Start reading...\n");
-         while(j < 10)
+         while(j < 50)
          {
+            numberOfElements = 0;
             timeout = 0;     
+            status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, 
+                              &data[0], 
+                              numberOfElements, 
+                              timeout, 
+                              &elementsRemaining);
 
+            printf("Elements remaining before reading = %d, status = %d\n", elementsRemaining, status);
+
+            if (elementsRemaining >= 9) 
+            {
                numberOfElements = 9;
                status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
@@ -71,7 +80,7 @@ int main()
                               timeout,
                               &elementsRemaining);
                         
-               printf("Elements remaining = %d, status = %d\n", elementsRemaining, status);
+               printf("Elements remaining after reading = %d, status = %d\n", elementsRemaining, status);
                printf("Data:\t");
                for (int i = 0; i < numberOfElements; i++)
                   {              
@@ -80,8 +89,9 @@ int main()
                printf("\n"); 
                //status = NiFpga_ReleaseFifoElements(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, numberOfElements);
                //printf("status = %d\n", status);
-                            
-            usleep(1000000); // 1000 ms
+            } // end if
+                               
+            usleep(1000000); // 15 ms
             j++;
             printf("while iteration = %d\n", j);
             status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull, &fifoStatus);
