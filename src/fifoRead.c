@@ -41,8 +41,13 @@ int main()
       // If there is no error we run the FPGA
       if (NiFpga_IsNotError(status))
       {
+         /* Write the waitInMs */
+	 uint32_t waitInMs = 25; // 5 seconds
+         status = NiFpga_WriteU32(session, NiFpga_readDaq_ControlU32_waitInMs, &waitInMs);
+         
          /* run the FPGA application */
-  	      printf("Running the FPGA...\n");
+  	 printf("Running the FPGA...\n");
+         /* run the FPGA application */
          status = NiFpga_Run(session, 0);
          printf("Status to run the FPGA is %d\n", status);
    
