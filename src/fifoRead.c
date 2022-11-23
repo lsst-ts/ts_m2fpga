@@ -42,9 +42,11 @@ int main()
       if (NiFpga_IsNotError(status))
       {
          /* Write the waitInMs */
-	 uint32_t waitInMs = 5000; // 1000 miliseconds
+	 /* Time delay in the FPGA code to write elements */
+	 uint32_t waitInMs = 5000; // 5000 miliseconds
          status = NiFpga_WriteU32(session, NiFpga_mainFPGA_ControlU32_waitInMs, waitInMs);
-         
+	 printf("Status to write the waitInMs control in FPGA code is %d.\n", status);         
+
          /* run the FPGA application */
   	 printf("Running the FPGA...\n");
          /* run the FPGA application */
@@ -60,33 +62,41 @@ int main()
      
          int j = 0;
 	 printf("Start reading...\n");
-         while(j < 10)
+         while(j < 50)
          {
-            timeout = 0;     
+            printf("while iteration = %d\n", j);
+            timeout = -1;     
 
-               numberOfElements = 9;
+               numberOfElements = 5;
                status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
                               numberOfElements,
                               timeout,
                               &elementsRemaining);
                         
-               printf("Elements remaining = %d, status = %d\n", elementsRemaining, status);
-               printf("Data:\t");
+               printf("Status to read FIFO elements is %d\n", status);
+
+	       printf("Address:\n");  
+               for (int i = 0; i < numberOfElements; i++)
+                  { 
+                     printf("%p\t", &data[i]);
+                  }
+               printf("\n"); 
+               printf("Data:\n");
                for (int i = 0; i < numberOfElements; i++)
                   {              
                      printf("%d\t", data[i]);
                   }
                printf("\n"); 
+               printf("Elements remaining = %d\n", elementsRemaining);
                //status = NiFpga_ReleaseFifoElements(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, numberOfElements);
                //printf("status = %d\n", status);
                             
             usleep(1000000); // 1000 ms
             j++;
-            printf("while iteration = %d\n", j);
             status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull, &fifoStatus);
             printf("Status to read dataFifoFull boolean is %d\n", status);
-            printf("fifoStatus = %d\n",(int)fifoStatus);
+            printf("fifoStatus from FPGA = %d\n",(int)fifoStatus);
          } // end while
 
          
