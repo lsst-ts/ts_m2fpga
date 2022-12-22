@@ -4,7 +4,7 @@
  * Use m2-crio-simulator.ls.lsst.org
  * Use NI FPGA C API Interface
  * Use cRIO-9049
- * noElementsFifoDesign1
+ * lessElementsFifoDesign1
  */
 
 #include "../fpgaInterface/NiFpga_mainFPGA.h"
