@@ -58,6 +58,7 @@ int main()
          uint32_t timeout;
          size_t elementsRemaining = 0;
 	 NiFpga_Bool fifoStatus = 0;
+         int32_t fpgaError = 0;
      
          int j = 0;
          timeout = 0; 
@@ -65,7 +66,8 @@ int main()
          while(j < 20)
          {
             printf("while iteration = %d\n", j);
-            numberOfElements = 9;
+            // set the following value to 11 when want to test this branch
+            numberOfElements = 9; //request more elements than FPGA sends, same as read less (9) than requested (11)
             status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
                               numberOfElements,
@@ -89,8 +91,10 @@ int main()
             usleep(1000000); // 1000 ms
             j++;
             status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull, &fifoStatus);
-            printf("Status to read dataFifoFull boolean is %d\n", status);
-            printf("fifoStatus = %d\n",(int)fifoStatus);
+            printf("fifoStatus = %d, status = %d\n",(int)fifoStatus, status);
+
+            status = NiFpga_ReadI32(session, NiFpga_mainFPGA_IndicatorI32_fpgaError, &fpgaError);
+            printf("fpgaError = %d, status = %d\n", fpgaError, status);
          } // end while
 
          
@@ -106,7 +110,7 @@ int main()
          // printf("Press <Enter> to stop and quit...");
          // getchar();
 
-         /* stop the FPGA loops */
+         /* stop the FPGA loops */      
          printf("Stopping the FPGA...\n");
          
          /* close the session now that we're done */
