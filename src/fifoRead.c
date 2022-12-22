@@ -4,6 +4,7 @@
  * Use m2-crio-simulator.ls.lsst.org
  * Use NI FPGA C API Interface
  * Use cRIO-9049
+ * noElementsFifoDesign1
  */
 
 #include "../fpgaInterface/NiFpga_mainFPGA.h"
@@ -42,7 +43,7 @@ int main()
       if (NiFpga_IsNotError(status))
       {
          /* Write the waitInMs */
-	 uint32_t waitInMs = 5000; // 1000 miliseconds
+	 uint32_t waitInMs = 5000; // 5000 miliseconds
          status = NiFpga_WriteU32(session, NiFpga_mainFPGA_ControlU32_waitInMs, waitInMs);
          
          /* run the FPGA application */
@@ -56,41 +57,44 @@ int main()
          size_t numberOfElements;
          uint32_t timeout;
          size_t elementsRemaining = 0;
-	      NiFpga_Bool fifoStatus = 0;
+	 NiFpga_Bool fifoStatus = 0;
      
          int j = 0;
+         timeout = 0; 
 	 printf("Start reading...\n");
-         while(j < 10)
+         while(j < 20)
          {
-            timeout = 0;     
-
-               numberOfElements = 9;
-               status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
+            printf("while iteration = %d\n", j);
+            numberOfElements = 9;
+            status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
                               numberOfElements,
                               timeout,
                               &elementsRemaining);
                         
-               printf("Elements remaining = %d, status = %d\n", elementsRemaining, status);
+            printf("status to read FIFO is %d\n", status);
+            //printf("Elements remaining = %d, status = %d\n", elementsRemaining, status);
+            
+            /* Read data if there are elements in FIFO only */
+            if (status == 0){
                printf("Data:\t");
-               for (int i = 0; i < numberOfElements; i++)
-                  {              
-                     printf("%d\t", data[i]);
-                  }
+               for (int i = 0; i < numberOfElements; i++){              
+                   printf("%d\t", data[i]);
+                   }
                printf("\n"); 
                //status = NiFpga_ReleaseFifoElements(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, numberOfElements);
                //printf("status = %d\n", status);
-                            
+               } // end if             
+            else printf("No data to read yet...\n");
             usleep(1000000); // 1000 ms
             j++;
-            printf("while iteration = %d\n", j);
             status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_dataFifoFull, &fifoStatus);
             printf("Status to read dataFifoFull boolean is %d\n", status);
             printf("fifoStatus = %d\n",(int)fifoStatus);
          } // end while
 
          
-	      // check whether or not there are elements remaining
+	 // check whether or not there are elements remaining
          numberOfElements = 0;
          status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
