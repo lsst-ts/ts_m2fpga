@@ -93,11 +93,11 @@ int main()
                                     &elementsAcquired,
                                     &elementsRemaining);
                printf("status to read FIFO is %d\n", status);       
-               printf("Data:\n");
                printf("Addresses:\n");
                for (int i=0; i<numberOfElements; i++){
                   printf("%p\t", (pData+i));
                   }
+               printf("Data:\n");
                for (int i=0; i<numberOfElements; i++){              
                    printf("%d\t", *(pData+i));
                    }
