@@ -4,7 +4,7 @@
  * Use m2-crio-simulator.ls.lsst.org
  * Use NI FPGA C API Interface
  * Use cRIO-9049
- * I want to read 1 element and there is no element in FIFO
+ * I want to read 1 element and there is 1 element in FIFO
  */
 
 #include "../fpgaInterface/NiFpga_mainFPGA.h"
@@ -53,13 +53,11 @@ int main()
          size_t numberOfElements;
          uint32_t timeout;
          size_t elementsRemaining = 0;
-	 NiFpga_Bool readFifoNow = 0, stop = 0;
      
-         int j = 0;
          timeout = 0; // miliseconds 
 	 printf("Start reading...\n");
          
-         numberOfElements = 1;                                      
+         numberOfElements = 2;                                      
          status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
                               numberOfElements,
@@ -70,29 +68,9 @@ int main()
          for (int i = 0; i < numberOfElements; i++){              
              printf("%d\t", data[i]);
              }
-         printf("\n"); 
-         
-         status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_stop, &stop);
-         printf("stop = %d, status = %d\n", (int)stop, status);
-         while(stop == 0){
-
-            status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_readFifoNow, &readFifoNow);
-            printf("readFifoNow = %d, status = %d\n", (int)readFifoNow, status);
-                  
-            if(readFifoNow == 1){
-               numberOfElements = 1;
-               status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
-                              &data[0],
-                              numberOfElements,
-                              timeout,
-                              &elementsRemaining);
-               printf("status to read FIFO is %d\n", status);       
-               } // end if
-            usleep(100000); // 100 ms
-
-            status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_stop, &stop);
-            printf("stop = %d, status = %d\n", (int)stop, status);
-            } // end while
+         printf("\n");         
+                
+         //usleep(100000); // 100 ms
          
 	 // check whether or not there are elements remaining
          numberOfElements = 0;
