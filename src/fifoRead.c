@@ -1,6 +1,6 @@
 /*
  * Example code to C/C++ developer
- * Use NiFpga_ReadFifoU16() to read FIFO elements
+ * Use NiFpga_AcquireFifoReadElementsU16() to read FIFO elements
  * Use m2-crio-simulator.ls.lsst.org
  * Use NI FPGA C API Interface
  * Use cRIO-9049
@@ -49,44 +49,59 @@ int main()
          printf("Status to run the FPGA is %d\n", status);
    
          // Variables //
-         uint16_t data[9] = {0};
+         uint16_t* pData = NULL;
          size_t numberOfElements;
          uint32_t timeout;
          size_t elementsRemaining = 0;
+         size_t elementsAcquired = 0;
 	 NiFpga_Bool readFifoNow = 0, stop = 0;
      
-         int j = 0;
          timeout = 0; // miliseconds 
 	 printf("Start reading...\n");
          
          numberOfElements = 1;                                      
-         status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
-                              &data[0],
+         status = NiFpga_AcquireFifoReadElementsU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
+                              &pData,
                               numberOfElements,
                               timeout,
+                              &elementsAcquired,
                               &elementsRemaining);
          printf("status to read FIFO is %d\n", status);       
-         printf("Data:\t");
-         for (int i = 0; i < numberOfElements; i++){              
-             printf("%d\t", data[i]);
+         
+         printf("Addresses:\n");
+         for (int i=0; i<numberOfElements; i++){
+            printf("%p\t", (pData+i));
+            }
+         printf("Data:\n");
+         for (int i=0; i<numberOfElements; i++){              
+             printf("%d\t", *(pData+i));
              }
          printf("\n"); 
          
          status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_stop, &stop);
          printf("stop = %d, status = %d\n", (int)stop, status);
          while(stop == 0){
-
             status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_readFifoNow, &readFifoNow);
             printf("readFifoNow = %d, status = %d\n", (int)readFifoNow, status);
-                  
+                 
             if(readFifoNow == 1){
                numberOfElements = 1;
-               status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
-                              &data[0],
-                              numberOfElements,
-                              timeout,
-                              &elementsRemaining);
+               status = NiFpga_AcquireFifoReadElementsU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
+                                    &pData,
+                                    numberOfElements,
+                                    timeout,
+                                    &elementsAcquired,
+                                    &elementsRemaining);
                printf("status to read FIFO is %d\n", status);       
+               printf("Data:\n");
+               printf("Addresses:\n");
+               for (int i=0; i<numberOfElements; i++){
+                  printf("%p\t", (pData+i));
+                  }
+               for (int i=0; i<numberOfElements; i++){              
+                   printf("%d\t", *(pData+i));
+                   }
+               printf("\n"); 
                } // end if
             usleep(100000); // 100 ms
 
@@ -96,12 +111,13 @@ int main()
          
 	 // check whether or not there are elements remaining
          numberOfElements = 0;
-         status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
-                              &data[0],
-                              numberOfElements,
-                              timeout,
-                              &elementsRemaining);
-         printf("Elements Remaining = %d, status = %d\n", elementsRemaining, status);
+         //status = NiFpga_AcquireFifoReadElementsFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
+         //                     &pData,
+         //                     numberOfElements,
+         //                     timeout,
+         //                     &elementsAcquired,
+         //                     &elementsRemaining);
+         //printf("Elements Remaining = %d, status = %d\n", elementsRemaining, status);
 
          // printf("Press <Enter> to stop and quit...");
          // getchar();
