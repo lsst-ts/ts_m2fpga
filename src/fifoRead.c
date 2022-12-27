@@ -1,6 +1,6 @@
 /*
  * Example code to C/C++ developer
- * Use NiFpga_ReadFifoU16() to read FIFO elements
+ * Use NiFpga_AcquireFifoReadElementsU16() to read FIFO elements
  * Use m2-crio-simulator.ls.lsst.org
  * Use NI FPGA C API Interface
  * Use cRIO-9049
@@ -49,38 +49,34 @@ int main()
          printf("Status to run the FPGA is %d\n", status);
    
          // Variables //
-         uint16_t data[9] = {0};
+         uint16_t* pData = NULL;
          size_t numberOfElements;
          uint32_t timeout;
          size_t elementsRemaining = 0;
+         size_t elementsAcquired = 0;
      
          timeout = 0; // miliseconds 
 	 printf("Start reading...\n");
          
          numberOfElements = 2;                                      
-         status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
-                              &data[0],
+         status = NiFpga_AcquireFifoReadElementsU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
+                              &pData,
                               numberOfElements,
                               timeout,
+                              &elementsAcquired,
                               &elementsRemaining);
          printf("status to read FIFO is %d\n", status);       
-         printf("Data:\t");
-         for (int i = 0; i < numberOfElements; i++){              
-             printf("%d\t", data[i]);
-             }
-         printf("\n");         
-                
-         //usleep(100000); // 100 ms
          
-	 // check whether or not there are elements remaining
-         numberOfElements = 0;
-         status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
-                              &data[0],
-                              numberOfElements,
-                              timeout,
-                              &elementsRemaining);
-         printf("Elements Remaining = %d, status = %d\n", elementsRemaining, status);
-
+         printf("Addresses:\n");
+         for (int i=0; i<numberOfElements; i++){
+            printf("%p\t", (pData+i));
+            }
+         printf("Data:\n");
+         for (int i=0; i<numberOfElements; i++){              
+             printf("%d\t", *(pData+i));
+             }
+         printf("\n"); 
+         
          // printf("Press <Enter> to stop and quit...");
          // getchar();
 
