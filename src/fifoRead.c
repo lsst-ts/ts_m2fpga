@@ -4,7 +4,7 @@
  * Use m2-crio-simulator.ls.lsst.org
  * Use NI FPGA C API Interface
  * Use cRIO-9049
- * I want to read 1 element and there is 1 element in FIFO
+ * I want to release 1 element and there is 1 element in FIFO
  */
 
 #include "../fpgaInterface/NiFpga_mainFPGA.h"
@@ -42,28 +42,29 @@ int main()
       // If there is no error we run the FPGA
       if (NiFpga_IsNotError(status))
       {
-         /* run the FPGA application */
+         /* Run the FPGA application */
   	 printf("Running the FPGA...\n");
-         /* run the FPGA application */
          status = NiFpga_Run(session, 0);
          printf("Status to run the FPGA is %d\n", status);
    
-         // Variables //
+         /* Declare Variables */
          uint16_t data[9] = {0};
          size_t numberOfElements;
          uint32_t timeout;
          size_t elementsRemaining = 0;
      
-         timeout = 0; // miliseconds 
+         /* Read Fifo elements */
 	 printf("Start reading...\n");
-         
-         numberOfElements = 2;                                      
+         timeout = 0; // in miliseconds 
+         numberOfElements = 1;                                      
          status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
                               numberOfElements,
                               timeout,
                               &elementsRemaining);
          printf("status to read FIFO is %d\n", status);       
+         
+         /* Print elements read */
          printf("Data:\t");
          for (int i = 0; i < numberOfElements; i++){              
              printf("%d\t", data[i]);
@@ -72,7 +73,12 @@ int main()
                 
          //usleep(100000); // 100 ms
          
-	 // check whether or not there are elements remaining
+         /* Release elements */
+         size_t elements = 1; // number of elements to release
+         status =  NiFpga_ReleaseFifoElements(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, elements);
+         printf("Status to release elements = %d\n", status);
+
+	 /* Check whether or not there are elements remaining */
          numberOfElements = 0;
          status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
@@ -81,22 +87,17 @@ int main()
                               &elementsRemaining);
          printf("Elements Remaining = %d, status = %d\n", elementsRemaining, status);
 
-         // printf("Press <Enter> to stop and quit...");
-         // getchar();
-
-         /* stop the FPGA loops */
-         printf("Stopping the FPGA...\n");
-         
-         /* close the session now that we're done */
-         printf("Closing the session...\n");
+         /* Stop the FPGA loops */
+         printf("Closing the FPGA session...\n");
          status = NiFpga_Close(session, 0);
          printf("Status to close the FPGA %d\n", status);
-      }
+      } // end second if
+   
       /* must be called after all other calls */
       printf("Finalizing...\n");
       status = NiFpga_Finalize();
       printf("Status to finalize the FPGA %d\n", status);
-   } //end if
+   } //end first if
    
    /* check if anything went wrong */
    if (NiFpga_IsError(status))
