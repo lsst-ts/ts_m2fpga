@@ -44,21 +44,22 @@ int main()
       {
          /* run the FPGA application */
   	 printf("Running the FPGA...\n");
-         /* run the FPGA application */
          status = NiFpga_Run(session, 0);
          printf("Status to run the FPGA is %d\n", status);
    
-         // Variables //
+         /* Declare Variables */
          uint16_t data[9] = {0};
          size_t numberOfElements;
          uint32_t timeout;
          size_t elementsRemaining = 0;
 	 NiFpga_Bool readFifoNow = 0, stop = 0;
      
+	 /* Read Fifo elements once.
+            This allows to get the fifo empty later.
+          */
+         printf("Start reading...\n");
+         timeout = 0; // in miliseconds 
          int j = 0;
-         timeout = 0; // miliseconds 
-	 printf("Start reading...\n");
-         
          numberOfElements = 1;                                      
          status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
@@ -66,35 +67,44 @@ int main()
                               timeout,
                               &elementsRemaining);
          printf("status to read FIFO is %d\n", status);       
+         
+         /* Print elements read */
          printf("Data:\t");
          for (int i = 0; i < numberOfElements; i++){              
              printf("%d\t", data[i]);
              }
          printf("\n"); 
          
+         /* Read the stop boolean */
          status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_stop, &stop);
          printf("stop = %d, status = %d\n", (int)stop, status);
-         while(stop == 0){
-
-            status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_readFifoNow, &readFifoNow);
-            printf("readFifoNow = %d, status = %d\n", (int)readFifoNow, status);
+         //while(stop == 0){
+         //   status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_readFifoNow, &readFifoNow);
+         //   printf("readFifoNow = %d, status = %d\n", (int)readFifoNow, status);
                   
-            if(readFifoNow == 1){
-               numberOfElements = 1;
-               status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
-                              &data[0],
-                              numberOfElements,
-                              timeout,
-                              &elementsRemaining);
-               printf("status to read FIFO is %d\n", status);       
-               } // end if
-            usleep(100000); // 100 ms
-
-            status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_stop, &stop);
-            printf("stop = %d, status = %d\n", (int)stop, status);
-            } // end while
+            //if(readFifoNow == 1){
+            //   /* Try to read the empty fifo */
+            //   numberOfElements = 1;
+            //   status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
+            //                  &data[0],
+            //                  numberOfElements,
+            //                  timeout,
+            //                  &elementsRemaining);
+            //   printf("status to read FIFO is %d\n", status);       
+            //   } // end if
+         //   usleep(100000); // 100 ms
+         //   
+         //   /* Read the stop boolean again to stop the loop */
+         //   status = NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_stop, &stop);
+         //   printf("stop = %d, status = %d\n", (int)stop, status);
+         //   } // end while
          
-	 // check whether or not there are elements remaining
+          /* Release elements. Now the fifo is empy */
+          size_t elements = 1; // number of elements to release
+          status =  NiFpga_ReleaseFifoElements(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO, elements);
+          printf("Status to release elements = %d\n", status);
+
+	 /* Check whether or not there are elements remaining */
          numberOfElements = 0;
          status = NiFpga_ReadFifoU16(session, NiFpga_mainFPGA_TargetToHostFifoU16_daqFIFO,
                               &data[0],
