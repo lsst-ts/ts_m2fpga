@@ -1,5 +1,11 @@
 # Version History
 
+0.0.5
+
+- Update the `readDaq.md` file.
+- Create the `appendix.md` file.
+- Update the `README.md` file.
+
 0.0.4
 
 - Create the `bitfileDeployment.md` document.
