@@ -1,5 +1,12 @@
 # Version History
 
+0.0.6
+
+- Update the `readDaq.md` file.
+- Create the `appendix.md` file.
+- Update the `README.md` file.
+- Remove unnecessary files in `src/` directory.
+
 0.0.5
 
 - Update the `readDaq.md` file.
