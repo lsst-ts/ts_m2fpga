@@ -41,6 +41,7 @@ ts_m2fpga
 │   ├── switchRelays.md
 │   ├── readDaq.md
 │   ├── ilcCommmunication.md
+│   ├── appendix.md
 ├── fpgaInterface
 │   ├── NiFpga_mainFPGA.h
 │   ├── NiFpga.c
