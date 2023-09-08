@@ -18,7 +18,7 @@
 	</Item>
 	<Item Name="RT CompactRIO Target 2" Type="RT CompactRIO">
 		<Property Name="alias.name" Type="Str">RT CompactRIO Target 2</Property>
-		<Property Name="alias.value" Type="Str">139.229.147.247</Property>
+		<Property Name="alias.value" Type="Str">m2-crio-simulator.ls.lsst.org</Property>
 		<Property Name="CCSymbols" Type="Str">TARGET_TYPE,RT;OS,Linux;CPU,x64;DeviceCode,77B9;</Property>
 		<Property Name="crio.ControllerPID" Type="Str">77B9</Property>
 		<Property Name="host.ResponsivenessCheckEnabled" Type="Bool">true</Property>
