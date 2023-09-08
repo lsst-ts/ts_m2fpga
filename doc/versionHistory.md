@@ -1,5 +1,9 @@
 # Version History
 
+0.0.6
+
+- Change the target to cRIO-9038 and hold the bit file.
+
 0.0.5
 
 - Update the `readDaq.md` file.
