@@ -9,7 +9,7 @@ In that version, the VI named **4-port serial Master Slave.vi**, under `Chassis 
 
 - Windows 10
 - LabVIEW 2018 SP1 32-bit
-- cRIO-9049 (S/N: 01EAEB49)
+- cRIO-9038 (S/N: 01AD906F)
 
 ## Needed Package
 

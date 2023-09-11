@@ -16,9 +16,6 @@
 *.lvlps
 .cache/
 
-# bitfile
-fpgaInterface/bitfile
-
 # Vscode setting
 .vscode/
 
