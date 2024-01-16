@@ -25,6 +25,7 @@
 // System headers
 #include <iostream>
 #include <thread>
+#include <unistd.h>
 
 // Project headers
 #include "m2fpga_c/NiFpga_mainFPGA.h"
@@ -40,10 +41,13 @@ int FpgaDemo::run() {
         // opens a session, downloads the bitstream, and runs the FPGA
         cout << "Opening a session...\n";
         // TODO: NiFpga_FPGA_VI_Bitfile probably needs to be prepended with a path
-        string bitfile = NiFpga_mainFPGA_Bitfile;
+        string cwd = get_current_dir_name();
+        //&&&string bitfile = cwd + "/" + NiFpga_mainFPGA_Bitfile;
+        string bitfile = cwd + "/" + "m2fpga_FPGATarget2_mainFPGA_QMvIodQP5L8.lvbitx";
         cout << "opening " << bitfile << endl;
         NiFpga_MergeStatus(&status, NiFpga_Open(bitfile.c_str(), NiFpga_mainFPGA_Signature, "RIO0",
                                                 NiFpga_OpenAttribute_NoRun, &session));
+        cout << "NiFpga_MergeStatus complete status=" << status << endl;
         if (NiFpga_IsNotError(status)) {
             // run the FPGA application
             cout << "Running the FPGA...\n";
