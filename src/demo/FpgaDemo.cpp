@@ -59,7 +59,7 @@ int FpgaDemo::run() {
             //&&& NiFpga_Bool userSw2 = 6;
             //&&& NiFpga_Bool userSw3 = 2;
 
-            const int SIZE = 256;
+            const int SIZE = 5;
             uint8_t inputSwitches[SIZE]; /// input form FPGA switches
             int16_t output[SIZE] = {0}; /// output to FPGA FIFO_A
             int16_t input[SIZE];  /// input from FPGA FIFO_B
@@ -113,8 +113,8 @@ int FpgaDemo::run() {
                                                        output, SIZE, NiFpga_InfiniteTimeout, NULL));
 
                 // copy FIFO data from the FPGA FIFO_B
-                NiFpga_MergeStatus(
-                        &status, NiFpga_ReadFifoI16(session, NiFpga_mainFPGA_TargetToHostFifoI16_FIFO_B, input,
+                NiFpga_MergeStatus(&status,
+                                    NiFpga_ReadFifoI16(session, NiFpga_mainFPGA_TargetToHostFifoI16_FIFO_B, input,
                                                     SIZE, NiFpga_InfiniteTimeout, NULL));
 
                 str = " input=";
