@@ -54,27 +54,18 @@ int FpgaDemo::run() {
             NiFpga_MergeStatus(&status, NiFpga_Run(session, 0));
 
             cout << "loop start" << endl;
-            NiFpga_Bool ilcMotorPowerOn = 0;
-            uint8_t ilcCommPowerOn = 5;
-            uint32_t inputPortReadU32 = 0;
-            //&&& NiFpga_Bool userSw2 = 6;
-            //&&& NiFpga_Bool userSw3 = 2;
+            NiFpga_Bool ilcMotorPowerOn = 0; // &&& doc
+            uint8_t ilcCommPowerOn = 5; // &&& doc
+            uint32_t inputPortReadU32 = 0; // &&& doc
+            uint8_t outputPortLBReadU8 = 0; // &&& doc
 
-            const int SIZE = 10;
+            const int SIZE = 10; // &&& doc
             uint8_t inputSwitches[SIZE]; /// input fromm FPGA switches
             int16_t output[SIZE] = {0}; /// output to FPGA FIFO_A  TODO:Remove once testing is done
             int16_t input[SIZE];  /// input from FPGA FIFO_B  TODO:Remove once testing is done
 
             uint8_t outputPort[SIZE]; /// ouput to FPGA DO_DAQ
             uint32_t inputPort[SIZE]; /// input from FPGA DI_DAQ
-
-
-            /* TODO: alternate fifo read and write methods?
-            int16_t* writeElements;
-            int16_t* readElements;
-            size_t writeElementsAcquired;
-            size_t readElementsAcquired;
-            */
 
             // Put something identifiable in the output buffer
             for (int j=1; j < SIZE; ++j) {
@@ -97,14 +88,19 @@ int FpgaDemo::run() {
                 NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_ILC_CommPowerOnLB,
                                                             &ilcCommPowerOn));
 
+                // read uint8 indicators
+                NiFpga_MergeStatus(&status, NiFpga_ReadU8(session, NiFpga_mainFPGA_IndicatorU8_outputPort_U8_LB,
+                                                            &outputPortLBReadU8));
+
                 // read uint32 indicators
                 NiFpga_MergeStatus(&status, NiFpga_ReadU32(session, NiFpga_mainFPGA_IndicatorU32_inputPort_U32,
                                                             &inputPortReadU32));
 
                 int opw = outputPortWriteVal;
+                int oplb = outputPortLBReadU8;
                 cout << "ilcMotorPowerOn=" << ((ilcMotorPowerOn) ? "t" : "f") << " " << hex << (int)ilcMotorPowerOn;
-                cout << " ilcCommPowerOn=" << ((ilcCommPowerOn) ? "t" : "f") << " " << hex << (int)ilcCommPowerOn;
-                cout << "outputPortWrite=" << opw << " inputPortRead=" << inputPortReadU32 << endl;
+                cout << " ilcCommPowerOn=" << ((ilcCommPowerOn) ? "t" : "f") << " " << hex << (int)ilcCommPowerOn << endl;
+                cout << "outputPortWrite=" << dec << opw << " outputLB=" << oplb << " inputPortRead=" << inputPortReadU32 << endl;
 
                 // copy FIFO data from the FPGA that's connected to the switches.
                 int sz = 1;
@@ -156,36 +152,6 @@ int FpgaDemo::run() {
                 for (int j=1; j < SIZE; ++j) {
                     output[j] = output[j-1] + 1;
                 }
-                /* TODO: this looks like method that may be faster for reading FIFO's, need to look into it.
-                // acquire elements we can write to without an additional copy
-                NiFpga_MergeStatus(&status,
-                                   NiFpga_AcquireFifoWriteElementsI16(
-                                           session, NiFpga_Example_HostToTargetFifoI16_Output, &writeElements,
-                                           SIZE, NiFpga_InfiniteTimeout, &writeElementsAcquired, NULL));
-                if (NiFpga_IsNotError(status)) {
-                    // TODO: write directly to writeElements[0] through
-                    //         writeElements[writeElementsAcquired - 1]
-                    NiFpga_MergeStatus(&status, NiFpga_ReleaseFifoElements(
-                                                        session, NiFpga_Example_HostToTargetFifoI16_Output,
-                                                        writeElementsAcquired));
-
-                }
-                */
-
-                /* TODO: this also first?
-                // acquire elements we can read from without an additional copy
-                NiFpga_MergeStatus(&status,
-                                   NiFpga_AcquireFifoReadElementsI16(
-                                           session, NiFpga_Example_TargetToHostFifoI16_Input, &readElements,
-                                           SIZE, NiFpga_InfiniteTimeout, &readElementsAcquired, NULL));
-                if (NiFpga_IsNotError(status)) {
-                    // TODO: read directly from readElements[0] through
-                    //     readElements[readElementsAcquired - 1]
-                    NiFpga_MergeStatus(&status, NiFpga_ReleaseFifoElements(
-                                                        session, NiFpga_Example_TargetToHostFifoI16_Input,
-                                                        readElementsAcquired));
-                }
-                */
 
                 this_thread::sleep_for(100ms);
             }
