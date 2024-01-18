@@ -42,8 +42,8 @@ int FpgaDemo::run() {
         cout << "Opening a session...\n";
         // TODO: NiFpga_FPGA_VI_Bitfile probably needs to be prepended with a path
         string cwd = get_current_dir_name();
-        //&&&string bitfile = cwd + "/" + NiFpga_mainFPGA_Bitfile;
-        string bitfile = cwd + "/" + "m2fpga_FPGATarget2_mainFPGA_QMvIodQP5L8.lvbitx";
+        string bitfile = cwd + "/" + NiFpga_mainFPGA_Bitfile;
+        //&&&string bitfile = cwd + "/" + "m2fpga_FPGATarget2_mainFPGA_QMvIodQP5L8.lvbitx";
         cout << "opening " << bitfile << endl;
         NiFpga_MergeStatus(&status, NiFpga_Open(bitfile.c_str(), NiFpga_mainFPGA_Signature, "RIO0",
                                                 NiFpga_OpenAttribute_NoRun, &session));
@@ -56,13 +56,19 @@ int FpgaDemo::run() {
             cout << "loop start" << endl;
             NiFpga_Bool ilcMotorPowerOn = 0;
             uint8_t ilcCommPowerOn = 5;
+            uint32_t inputPortReadU32 = 0;
             //&&& NiFpga_Bool userSw2 = 6;
             //&&& NiFpga_Bool userSw3 = 2;
 
-            const int SIZE = 5;
-            uint8_t inputSwitches[SIZE]; /// input form FPGA switches
-            int16_t output[SIZE] = {0}; /// output to FPGA FIFO_A
-            int16_t input[SIZE];  /// input from FPGA FIFO_B
+            const int SIZE = 10;
+            uint8_t inputSwitches[SIZE]; /// input fromm FPGA switches
+            int16_t output[SIZE] = {0}; /// output to FPGA FIFO_A  TODO:Remove once testing is done
+            int16_t input[SIZE];  /// input from FPGA FIFO_B  TODO:Remove once testing is done
+
+            uint8_t outputPort[SIZE]; /// ouput to FPGA DO_DAQ
+            uint32_t inputPort[SIZE]; /// input from FPGA DI_DAQ
+
+
             /* TODO: alternate fifo read and write methods?
             int16_t* writeElements;
             int16_t* readElements;
@@ -75,31 +81,46 @@ int FpgaDemo::run() {
                 output[j] = output[j-1] + 1;
             }
 
+            // Set the output source, indicator of FIFO
+            NiFpga_Bool outputSourceControl = NiFpga_True;
+            NiFpga_MergeStatus(&status, NiFpga_WriteBool(session, NiFpga_mainFPGA_ControlBool_useOutputControl, outputSourceControl));
+
+            uint8_t outputPortWriteVal = 0;
             while (_loop) {
-                // read ILCMotorPowerOn
+                // Write a value to the outputPort
+                NiFpga_MergeStatus(&status, NiFpga_WriteBool(session, NiFpga_mainFPGA_ControlU8_outputPort_U8, outputPortWriteVal));
+                ++outputPortWriteVal;
+
+                // read boolean indicators ILCMotorPowerOn
                 NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_ILC_MotorPowerOnLB,
                                                             &ilcMotorPowerOn));
                 NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_ILC_CommPowerOnLB,
                                                             &ilcCommPowerOn));
-                /* &&&
-                NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_FPGA_VI_IndicatorBool_UserSwitch2,
-                                                            &userSw2));
-                NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_FPGA_VI_IndicatorBool_UserSwitch3,
-                                                            &userSw3));
-                */
 
+                // read uint32 indicators
+                NiFpga_MergeStatus(&status, NiFpga_ReadU32(session, NiFpga_mainFPGA_IndicatorU32_inputPort_U32,
+                                                            &inputPortReadU32));
+
+                int opw = outputPortWriteVal;
                 cout << "ilcMotorPowerOn=" << ((ilcMotorPowerOn) ? "t" : "f") << " " << hex << (int)ilcMotorPowerOn;
                 cout << " ilcCommPowerOn=" << ((ilcCommPowerOn) ? "t" : "f") << " " << hex << (int)ilcCommPowerOn;
-                /* &&&
-                cout << " userSw2=" << ((userSw2) ? "t" : "f") << " " << hex << (int)userSw2;
-                cout << " userSw3=" << ((userSw3) ? "t" : "f") << " " << hex << (int)userSw3 << endl;
-                */
+                cout << "outputPortWrite=" << opw << " inputPortRead=" << inputPortReadU32 << endl;
 
                 // copy FIFO data from the FPGA that's connected to the switches.
                 int sz = 1;
                 NiFpga_MergeStatus(
                         &status, NiFpga_ReadFifoU8(session, NiFpga_mainFPGA_TargetToHostFifoU8_U8_FIFO, inputSwitches,
                                                     sz, NiFpga_InfiniteTimeout, NULL));
+
+                // copy ouput port information to FPGA
+                NiFpga_MergeStatus(&status,
+                                   NiFpga_WriteFifoU8(session, NiFpga_mainFPGA_HostToTargetFifoU8_FIFO_ToFPGA_U8,
+                                                       outputPort, 1, NiFpga_InfiniteTimeout, NULL));
+
+                // copy FIFO data from FIFO_FromFPGA_U32
+                NiFpga_MergeStatus(&status,
+                                    NiFpga_ReadFifoU32(session,  NiFpga_mainFPGA_TargetToHostFifoU32_FIFO_FromFPGA_U32, inputPort,
+                                                    1, NiFpga_InfiniteTimeout, NULL));
 
                 string str("switches=");
                 for (int j = 0; j < sz; ++j) {
