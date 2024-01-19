@@ -33,6 +33,27 @@
 using namespace std;
 namespace LSST {
 
+/// Input 16 bits has the signed integer value in the 7 high order bits while
+/// the lower order bits are scaled between 0 and 1.
+double convertFxp16_7(int16_t inVal) {
+    int16_t maskHi = 0b1111111000000000;
+    int16_t minVal = 0b0000001000000000;
+    int16_t maskLow = ~maskHi;
+    int16_t highOrder = inVal & maskHi;
+    double highOrderDbl = highOrder;
+    highOrderDbl /= minVal;
+    int16_t lowOrder = inVal & maskLow;
+    double lowOrderDbl = lowOrder;
+    lowOrderDbl /= minVal;
+    double outVal = highOrderDbl + lowOrderDbl;
+    cout << "highOrderDbl=" << highOrderDbl << " lowOrderDbl=" << lowOrderDbl << " out=" << outVal << endl;
+
+    highOrderDbl = (double)(highOrder >> 9);
+    cout << "highOrderDbl=" << highOrderDbl << endl;
+    return outVal;
+}
+
+
 int FpgaDemo::run() {
     cout << "Initializing...\n";
     NiFpga_Status status = NiFpga_Initialize();
@@ -102,11 +123,28 @@ int FpgaDemo::run() {
                 cout << " ilcCommPowerOn=" << ((ilcCommPowerOn) ? "t" : "f") << " " << hex << (int)ilcCommPowerOn << endl;
                 cout << "outputPortWrite=" << dec << opw << " outputLB=" << oplb << " inputPortRead=" << inputPortReadU32 << endl;
 
+                // A to D tests
+                // copy FIFO data from Comm Voltage FIFO and convert.
+                int16_t commVoltFxp16_7[1];
+                NiFpga_MergeStatus(&status,
+                                    NiFpga_ReadFifoI16(session, NiFpga_mainFPGA_TargetToHostFifoI16_FIFO_CommVoltage,
+                                                       commVoltFxp16_7,
+                                                       1, NiFpga_InfiniteTimeout, NULL));
+                double commVolt = convertFxp16_7(commVoltFxp16_7[0]);
+                cout << "commVoltFxp16_7[0]=" << commVoltFxp16_7[0] << " commVolt=" << commVolt << endl;
+
+                // old test
                 // copy FIFO data from the FPGA that's connected to the switches.
                 int sz = 1;
                 NiFpga_MergeStatus(
                         &status, NiFpga_ReadFifoU8(session, NiFpga_mainFPGA_TargetToHostFifoU8_U8_FIFO, inputSwitches,
                                                     sz, NiFpga_InfiniteTimeout, NULL));
+                string str("switches=");
+                for (int j = 0; j < sz; ++j) {
+                    str += to_string(inputSwitches[j]) + " ";
+                }
+                cout << str << endl;
+
 
                 // copy ouput port information to FPGA
                 NiFpga_MergeStatus(&status,
@@ -118,12 +156,8 @@ int FpgaDemo::run() {
                                     NiFpga_ReadFifoU32(session,  NiFpga_mainFPGA_TargetToHostFifoU32_FIFO_FromFPGA_U32, inputPort,
                                                     1, NiFpga_InfiniteTimeout, NULL));
 
-                string str("switches=");
-                for (int j = 0; j < sz; ++j) {
-                    str += to_string(inputSwitches[j]) + " ";
-                }
-                cout << str << endl;
 
+                // FIFO write -> FIFO read test -------------------------------------
                 // copy FIFO data to FPGA FIFO_A
                 NiFpga_MergeStatus(&status,
                                    NiFpga_WriteFifoI16(session, NiFpga_mainFPGA_HostToTargetFifoI16_FIFO_A,
