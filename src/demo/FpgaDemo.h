@@ -26,12 +26,10 @@
 // System headers
 #include <atomic>
 
-
 namespace LSST {
 
 /// Class used to test cRIO FPGA communication.
-class FpgaDemo
-{
+class FpgaDemo {
 public:
     FpgaDemo() = default;
     ~FpgaDemo() = default;
@@ -45,7 +43,6 @@ public:
 private:
     std::atomic<bool> _loop{true};
 };
-
 
 }  // namespace LSST
 

@@ -24,7 +24,7 @@
 /**
  * The signature of the FPGA bitfile.
  */
-static const char* const NiFpga_mainFPGA_Signature = "F7C96215253D28058C85CBFEFFDE3C56";
+static const char* const NiFpga_mainFPGA_Signature = "FB6E9B76BD6D3FD0C5E93FCB815BAF08";
 
 typedef enum
 {
@@ -32,47 +32,38 @@ typedef enum
    NiFpga_mainFPGA_IndicatorBool_FIFO_B_TimedOut = 0x1801E,
    NiFpga_mainFPGA_IndicatorBool_ILC_CommPowerOnLB = 0x18016,
    NiFpga_mainFPGA_IndicatorBool_ILC_MotorPowerOnLB = 0x18012,
-   NiFpga_mainFPGA_IndicatorBool_TimedOut_FromFPGA_U32 = 0x1802A,
-   NiFpga_mainFPGA_IndicatorBool_TimedOut_ToFPGA_U8 = 0x18026,
    NiFpga_mainFPGA_IndicatorBool_U8_FIFO_TimedOut = 0x18022,
 } NiFpga_mainFPGA_IndicatorBool;
 
 typedef enum
 {
    NiFpga_mainFPGA_IndicatorU8_debugControlRelays = 0x18006,
-   NiFpga_mainFPGA_IndicatorU8_outputPort_U8_LB = 0x1803A,
+   NiFpga_mainFPGA_IndicatorU8_outputPort_U8_LB = 0x18032,
 } NiFpga_mainFPGA_IndicatorU8;
 
 typedef enum
 {
-   NiFpga_mainFPGA_IndicatorI16_ILC_Volt_Raw = 0x1804E,
+   NiFpga_mainFPGA_IndicatorI16_ILC_Comm_Current = 0x1803E,
+   NiFpga_mainFPGA_IndicatorI16_ILC_Comm_Voltage = 0x18042,
+   NiFpga_mainFPGA_IndicatorI16_ILC_Motor_Current = 0x18036,
+   NiFpga_mainFPGA_IndicatorI16_ILC_Motor_Voltage = 0x1803A,
 } NiFpga_mainFPGA_IndicatorI16;
 
 typedef enum
 {
-   NiFpga_mainFPGA_IndicatorU32_inputPort_U32 = 0x1802C,
+   NiFpga_mainFPGA_IndicatorU32_inputPort_U32 = 0x18024,
 } NiFpga_mainFPGA_IndicatorU32;
 
 typedef enum
 {
-   NiFpga_mainFPGA_ControlBool_useOutputControl = 0x18036,
+   NiFpga_mainFPGA_ControlBool_useOutputControl = 0x1802E,
 } NiFpga_mainFPGA_ControlBool;
 
 typedef enum
 {
    NiFpga_mainFPGA_ControlU8_controlRelays = 0x18002,
-   NiFpga_mainFPGA_ControlU8_outputPort_U8 = 0x18032,
+   NiFpga_mainFPGA_ControlU8_outputPort_U8 = 0x1802A,
 } NiFpga_mainFPGA_ControlU8;
-
-typedef enum
-{
-   NiFpga_mainFPGA_IndicatorArrayBool_Booleanarray = 0x18052,
-} NiFpga_mainFPGA_IndicatorArrayBool;
-
-typedef enum
-{
-   NiFpga_mainFPGA_IndicatorArrayBoolSize_Booleanarray = 16,
-} NiFpga_mainFPGA_IndicatorArrayBoolSize;
 
 typedef enum
 {
@@ -81,7 +72,8 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_mainFPGA_TargetToHostFifoI16_FIFO_B = 6,
+   NiFpga_mainFPGA_TargetToHostFifoI16_FIFO_B = 7,
+   NiFpga_mainFPGA_TargetToHostFifoI16_FIFO_CommCurrent = 6,
    NiFpga_mainFPGA_TargetToHostFifoI16_FIFO_CommVoltage = 5,
    NiFpga_mainFPGA_TargetToHostFifoI16_FIFO_MotorCurrent = 3,
    NiFpga_mainFPGA_TargetToHostFifoI16_FIFO_MotorVoltage = 2,
@@ -99,7 +91,7 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_mainFPGA_HostToTargetFifoI16_FIFO_A = 7,
+   NiFpga_mainFPGA_HostToTargetFifoI16_FIFO_A = 8,
 } NiFpga_mainFPGA_HostToTargetFifoI16;
 
 #endif
