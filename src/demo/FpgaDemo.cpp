@@ -33,7 +33,7 @@
 using namespace std;
 namespace LSST {
 
-/// Convert a signed 16 bit FPX to a float.
+/// Convert a signed 16 bit fixed point value (FPX) to a float.
 /// Input 16 bits has the signed integer value in the high order bits while
 /// the lower order bits contain a value that is scaled between 0 and 1.
 /// @param inVal bytes representing the input value.
@@ -67,6 +67,15 @@ float convertFxp16(int16_t inVal, int highOrderBits) {
     return outVal;
 }
 
+
+/// Test the output of the convertFxp16 function.
+/// Binary input values and floating point output values were found by simulating
+/// FXP controls and binary arrays in LabView.
+/// @param inVal Input FXP
+/// @param outVal
+/// @param highOrderBits
+/// @param log
+/// @return
 bool test_convertFxp16(int16_t inVal, float outVal, int highOrderBits, bool log = false) {
     float convVal = convertFxp16(inVal, highOrderBits);
     float maxLow = 1 << (16 - highOrderBits);
@@ -128,10 +137,8 @@ int FpgaDemo::run() {
         NiFpga_Session session;
         // opens a session, downloads the bitstream, and runs the FPGA
         cout << "Opening a session...\n";
-        // TODO: NiFpga_FPGA_VI_Bitfile probably needs to be prepended with a path
         string cwd = get_current_dir_name();
         string bitfile = cwd + "/" + NiFpga_mainFPGA_Bitfile;
-        //&&&string bitfile = cwd + "/" + "m2fpga_FPGATarget2_mainFPGA_QMvIodQP5L8.lvbitx";
         cout << "opening " << bitfile << endl;
         NiFpga_MergeStatus(&status, NiFpga_Open(bitfile.c_str(), NiFpga_mainFPGA_Signature, "RIO0",
                                                 NiFpga_OpenAttribute_NoRun, &session));
@@ -142,63 +149,17 @@ int FpgaDemo::run() {
             NiFpga_MergeStatus(&status, NiFpga_Run(session, 0));
 
             cout << "loop start" << endl;
-            NiFpga_Bool ilcMotorPowerOn = 0;  // &&& doc
-            uint8_t ilcCommPowerOn = 5;       // &&& doc
-            uint32_t inputPortReadU32 = 0;    // &&& doc
-            uint8_t outputPortLBReadU8 = 0;   // &&& doc
+            uint32_t inputPortReadU32 = 0;  // Value read from inputPort U32 indicator.
 
-            const int SIZE = 10;          // &&& doc
-            uint8_t inputSwitches[SIZE];  /// input fromm FPGA switches
-            int16_t output[SIZE] = {0};   /// output to FPGA FIFO_A  TODO:Remove once testing is done
-            int16_t input[SIZE];          /// input from FPGA FIFO_B  TODO:Remove once testing is done
-
-            uint8_t outputPort[SIZE];  /// ouput to FPGA DO_DAQ
+            const int SIZE = 10;       // Size of arrays used with FIFO's. Usually only element 0 is used.
+            uint8_t outputPort[SIZE];  /// output to FPGA DO_DAQ
             uint32_t inputPort[SIZE];  /// input from FPGA DI_DAQ
 
-            // Put something identifiable in the output buffer
-            for (int j = 1; j < SIZE; ++j) {
-                output[j] = output[j - 1] + 1;
-            }
-
-            // Set the output source, indicator of FIFO
-            NiFpga_Bool outputSourceControl = NiFpga_True;
-            NiFpga_MergeStatus(&status,
-                               NiFpga_WriteBool(session, NiFpga_mainFPGA_ControlBool_useOutputControl,
-                                                outputSourceControl));
-
-            uint8_t outputPortWriteVal = 0;
             while (_loop) {
-                // Write a value to the outputPort
-                NiFpga_MergeStatus(&status, NiFpga_WriteBool(session, NiFpga_mainFPGA_ControlU8_outputPort_U8,
-                                                             outputPortWriteVal));
-                ++outputPortWriteVal;
-
-                // read boolean indicators ILCMotorPowerOn
-                NiFpga_MergeStatus(&status,
-                                   NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_ILC_MotorPowerOnLB,
-                                                   &ilcMotorPowerOn));
-                NiFpga_MergeStatus(&status,
-                                   NiFpga_ReadBool(session, NiFpga_mainFPGA_IndicatorBool_ILC_CommPowerOnLB,
-                                                   &ilcCommPowerOn));
-
-                // read uint8 indicators
-                NiFpga_MergeStatus(&status,
-                                   NiFpga_ReadU8(session, NiFpga_mainFPGA_IndicatorU8_outputPort_U8_LB,
-                                                 &outputPortLBReadU8));
-
                 // read uint32 indicators
                 NiFpga_MergeStatus(&status,
                                    NiFpga_ReadU32(session, NiFpga_mainFPGA_IndicatorU32_inputPort_U32,
                                                   &inputPortReadU32));
-
-                int opw = outputPortWriteVal;
-                int oplb = outputPortLBReadU8;
-                cout << "ilcMotorPowerOn=" << ((ilcMotorPowerOn) ? "t" : "f") << " " << hex
-                     << (int)ilcMotorPowerOn;
-                cout << " ilcCommPowerOn=" << ((ilcCommPowerOn) ? "t" : "f") << " " << hex
-                     << (int)ilcCommPowerOn << endl;
-                cout << "outputPortWrite=" << dec << opw << " outputLB=" << oplb
-                     << " inputPortRead=" << inputPortReadU32 << endl;
 
                 // A to D tests
                 // copy FIFO data from Comm Voltage FIFO and convert.
@@ -207,63 +168,21 @@ int FpgaDemo::run() {
                         &status,
                         NiFpga_ReadFifoI16(session, NiFpga_mainFPGA_TargetToHostFifoI16_FIFO_CommVoltage,
                                            commVoltFxp16_7, 1, NiFpga_InfiniteTimeout, NULL));
-                //&&&double commVolt = convertFxp16_7(commVoltFxp16_7[0]);
                 float commVolt = convertFxp16(commVoltFxp16_7[0], 7);
                 cout << "commVoltFxp16_7[0]=" << commVoltFxp16_7[0] << " commVolt=" << commVolt << endl;
 
-                // old test
-                // copy FIFO data from the FPGA that's connected to the switches.
-                int sz = 1;
-                NiFpga_MergeStatus(&status,
-                                   NiFpga_ReadFifoU8(session, NiFpga_mainFPGA_TargetToHostFifoU8_U8_FIFO,
-                                                     inputSwitches, sz, NiFpga_InfiniteTimeout, NULL));
-                string str("switches=");
-                for (int j = 0; j < sz; ++j) {
-                    str += to_string(inputSwitches[j]) + " ";
-                }
-                cout << str << endl;
 
                 // copy ouput port information to FPGA
                 NiFpga_MergeStatus(
                         &status,
-                        NiFpga_WriteFifoU8(session, NiFpga_mainFPGA_HostToTargetFifoU8_FIFO_ToFPGA_U8,
+                        NiFpga_WriteFifoU8(session, NiFpga_mainFPGA_HostToTargetFifoU8_FIFO_ToFPGAOutPort_U8,
                                            outputPort, 1, NiFpga_InfiniteTimeout, NULL));
 
                 // copy FIFO data from FIFO_FromFPGA_U32
                 NiFpga_MergeStatus(
                         &status,
-                        NiFpga_ReadFifoU32(session, NiFpga_mainFPGA_TargetToHostFifoU32_FIFO_FromFPGA_U32,
+                        NiFpga_ReadFifoU32(session, NiFpga_mainFPGA_TargetToHostFifoU32_FIFO_FromFPGAInPort_U32,
                                            inputPort, 1, NiFpga_InfiniteTimeout, NULL));
-
-                // FIFO write -> FIFO read test -------------------------------------
-                // copy FIFO data to FPGA FIFO_A
-                NiFpga_MergeStatus(&status,
-                                   NiFpga_WriteFifoI16(session, NiFpga_mainFPGA_HostToTargetFifoI16_FIFO_A,
-                                                       output, SIZE, NiFpga_InfiniteTimeout, NULL));
-
-                // copy FIFO data from the FPGA FIFO_B
-                NiFpga_MergeStatus(&status,
-                                   NiFpga_ReadFifoI16(session, NiFpga_mainFPGA_TargetToHostFifoI16_FIFO_B,
-                                                      input, SIZE, NiFpga_InfiniteTimeout, NULL));
-
-                str = " input=";
-                for (int j = 0; j < SIZE; ++j) {
-                    str += to_string(input[j]) + " ";
-                }
-                cout << str << endl;
-
-                str = "output=";
-                for (int j = 0; j < SIZE; ++j) {
-                    str += to_string(output[j]) + " ";
-                }
-                cout << str << endl;
-
-                // Change the output for the next loop
-                output[0] = output[SIZE - 1];
-                if (output[0] > 20000) output[0] = -20000;
-                for (int j = 1; j < SIZE; ++j) {
-                    output[j] = output[j - 1] + 1;
-                }
 
                 this_thread::sleep_for(100ms);
             }
