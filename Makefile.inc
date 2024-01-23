@@ -41,10 +41,6 @@ else
   CPP := g++ $(CPP_COMMON) -fmessage-length=0
 endif
 
-
-
-# LIBS += $(shell pkg-config --libs) -ldl
-
 BOOST_CPPFLAGS := -I$(CONDA_PREFIX)/include/
 CPP_FLAGS += $(shell pkg-config --cflags)
 

@@ -38,12 +38,8 @@ all: doc m2fpga
 
 clean:
 	@$(foreach file,doc/html doc/latex,echo '[RM ] ${file}'; $(RM) -r $(file);)
-#	@$(foreach dir,tests,$(MAKE) -C ${dir} $@;)
 	$(RM) -r $(BUILD_DIR) $(LIB_DIR) $(BIN_DIR)
 
-# The tests should stay out of the BUILD_DIR.
-# tests: $(LIB_DIR)/libm2fpgacpp.a tests/Makefile tests/*.cpp
-#	@${MAKE} -C tests
 
 doc:
 	${co}doxygen Doxyfile
@@ -53,10 +49,10 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(MKDIR_P) $(dir $@)
 	$(CPP) $(CPPFLAGS) $(CXXFLAGS) $(CPPARGS) -c $< -o $@ $(CPP_LIBS)
 
-# assembly, kept for reference
-#$(BUILD_DIR)/%.s.o: %.s
-#	$(MKDIR_P) $(dir $@)
-#	$(AS) $(ASFLAGS) -c $< -o $@
+# assembly
+$(BUILD_DIR)/%.s.o: %.s
+	$(MKDIR_P) $(dir $@)
+	$(AS) $(ASFLAGS) -c $< -o $@
 
 # c source, kept for reference
 $(BUILD_DIR)/%.c.o: %.c

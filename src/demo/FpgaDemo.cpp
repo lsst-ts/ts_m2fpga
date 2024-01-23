@@ -67,7 +67,6 @@ float convertFxp16(int16_t inVal, int highOrderBits) {
     return outVal;
 }
 
-
 /// Test the output of the convertFxp16 function.
 /// Binary input values and floating point output values were found by simulating
 /// FXP controls and binary arrays in LabView.
@@ -75,7 +74,9 @@ float convertFxp16(int16_t inVal, int highOrderBits) {
 /// @param outVal
 /// @param highOrderBits
 /// @param log
-/// @return
+/// @return true if the value returned by `convertFxp16()` was within plus or minus
+///       `minDelta` of `outVal`. `minDelta` is the smallest fractional change
+///       possible using the number of low order bits available.
 bool test_convertFxp16(int16_t inVal, float outVal, int highOrderBits, bool log = false) {
     float convVal = convertFxp16(inVal, highOrderBits);
     float maxLow = 1 << (16 - highOrderBits);
@@ -171,7 +172,6 @@ int FpgaDemo::run() {
                 float commVolt = convertFxp16(commVoltFxp16_7[0], 7);
                 cout << "commVoltFxp16_7[0]=" << commVoltFxp16_7[0] << " commVolt=" << commVolt << endl;
 
-
                 // copy ouput port information to FPGA
                 NiFpga_MergeStatus(
                         &status,
@@ -180,9 +180,9 @@ int FpgaDemo::run() {
 
                 // copy FIFO data from FIFO_FromFPGA_U32
                 NiFpga_MergeStatus(
-                        &status,
-                        NiFpga_ReadFifoU32(session, NiFpga_mainFPGA_TargetToHostFifoU32_FIFO_FromFPGAInPort_U32,
-                                           inputPort, 1, NiFpga_InfiniteTimeout, NULL));
+                        &status, NiFpga_ReadFifoU32(
+                                         session, NiFpga_mainFPGA_TargetToHostFifoU32_FIFO_FromFPGAInPort_U32,
+                                         inputPort, 1, NiFpga_InfiniteTimeout, NULL));
 
                 this_thread::sleep_for(100ms);
             }
