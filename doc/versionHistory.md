@@ -1,5 +1,9 @@
 # Version History
 
+0.0.7
+
+- Added output port and input port I/o for M2.
+
 0.0.6
 
 - Change the target to cRIO-9038 and hold the bit file.
